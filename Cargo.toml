@@ -1,0 +1,20 @@
+[package]
+name = "isis_eps_api_v2"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = "1.0"
+bincode = "1.0"
+juniper = "0.14.2"
+failure = "0.1.2"
+serial = "0.4.0"
+cubeos-error = { git = "ssh://git@github.com/Cube-OS/cubeos-error.git"}
+rust-uart = { git = "ssh://git@github.com/Cube-OS/rust-uart.git" }
+rust-i2c = { git = "ssh://git@github.com/Cube-OS/rust-i2c.git" }
+rust-spi = { git = "ssh://git@github.com/Cube-OS/rust-spi.git" }
+rust-udp = { git = "ssh://git@github.com/Cube-OS/rust-udp.git" }
+
+
