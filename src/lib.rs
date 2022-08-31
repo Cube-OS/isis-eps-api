@@ -4,6 +4,7 @@ use std::cell::RefCell;
 use std::time::Duration;
 use std::thread;
 use serial::*;
+use isis_eps_service_v2::*; // move git address to cubeos
 
 // ID's
 const PDU_STID: u8 = 0x11;
@@ -105,8 +106,26 @@ pub enum DATA_REQUEST {
 
 // Error list
 pub enum Error {
+    #[fail(display = "Transfer error")]
     TransferError,
+    #[fail(display = "Bitflag error")]
     BitflagError,
+    // STAT Errors
+    #[fail(display = "Rejected error")]
+    RejectedError,
+    #[fail(display = "Rejected: Invalid command code error")]
+    RejectedInvalidCommandCodeError,
+    #[fail(display = "Rejected: Parameter missing error")]
+    RejectedParameterMissingError,
+    #[fail(display = "Rejected: Parameter invalid error")]
+    RejectedParameterInvalidError,
+    #[fail(display = "Rejected: Unavailable in current mode/configuration error")]
+    RejectedUnavailableError,
+    #[fail(display = "Rejected: Invalid system type, interface version, or BID error")]
+    RejectedInvalidError,
+    #[fail(display = "Internal error occurred during processing")]
+    InternalProcessingError,
+
 }
 
 // Result type to be implemented
@@ -117,29 +136,106 @@ pub struct EPS {
     buffer: RefCell<Vec<u8>>,
 }
 
+// Input/Output Structs
+// Could just define these as types
+// pub type timeCorrection = i32;
+// pub type OBC_BF = u16;
+// pub type OBC_IDX = u8;
+// pub type ROS = u8;
+
 pub struct addInput {
-    timeCorrection: i32,
-    OBC_BF: u16,
-    OBC_IDX: u8,
-    ROS: u8,
+    pub timeCorrection: i32,
+    pub OBC_BF: u16,
+    pub OBC_IDX: u8,
+    pub ROS: u8,
+}
+
+// Define the complex datatypes here ------------------------------------------
+pub struct VIPD {
+    VOLT: i16,
+    CURR: i16,
+    POWE: i16,
+}
+
+pub struct CCSD {
+    VOLT_IN_MPPT: u16,
+    CURR_IN_MPPT: u16,
+    VOLT_OU_MPPT: u16,
+    CURR_OU_MPPT: u16,
+}
+
+pub struct EPSOutput {
+    // Most functions only require STAT and the rest is N/A-----
+    pub STAT: u8,
+    // reserved: u8,-----
+    pub VOLT_BRDSUP: u16,
+    pub TEMP: u16,
+    pub VIP_DIST_INPUT: VIPD,
+    pub VIP_BAT_INPUT: VIPD,
+    pub STAT_OBC_ON: u16,
+    pub STAT_OBC_OCF: u16,
+    pub BAT_STAT: u16,
+    pub BAT_TEMP2: u16,
+    pub BAT_TEMP3: u16,
+    pub VOLT_VD0: u16,
+    pub VOLT_VD1: u16,
+    pub VOLT_VD2: u16,
+    pub VIP_OBC01: VIPD,
+    pub VIP_OBC02: VIPD,
+    pub VIP_OBC03: VIPD,
+    pub VIP_OBC04: VIPD,
+    pub VIP_OBC05: VIPD,
+    pub VIP_OBC06: VIPD,
+    pub VIP_OBC07: VIPD,
+    pub VIP_OBC08: VIPD,
+    pub CC1: CCSD,
+    pub CC2: CCSD,
+    pub CC3: CCSD,
+    // Below here are the daughterboard items, N/A if no daughterboard
+    pub VIP_OBC09: VIPD,
+    pub VIP_OBC10: VIPD,
+    pub VIP_OBC11: VIPD,
+    pub VIP_OBC12: VIPD,
+    pub VIP_OBC13: VIPD,
+    pub VIP_OBC14: VIPD,
+    pub CC4: CCSD,
+    pub CC5: CCSD,
+
+    // DO I ALSO ADD THE OTHER OUTPUTS FOR MISCELLANEOUS RETURNING FUNCTIONS
+
+}
+
+// Most other functions return the STAT parameter. Write function here to check the the STAT for the error code
+fn matchSTAT(typ: u8) -> epsResult<()> { // is it <T, Error> ?
+    match typ {
+        0x00 => Ok(),
+        0x01 => RejectedError,
+        0x02 => RejectedInvalidCommandCodeError,
+        0x03 => RejectedParameterMissingError,
+        0x04 => RejectedParameterInvalidError,
+        0x05 => RejectedUnavailableError,
+        0x06 => RejectedInvalidError,
+        0x07 => InternalProcessingError,
+        // Reserved values: 0x10, 0x20, 0x40
+        // NEW 0x80 set when the response is read for the first time
+    }
 }
 
 
-
 // STID match shortcut
-    fn matchSTID(typ: STID) -> u8 {
-        match typ {
-            STID::PduStid => PDU_STID,
-            STID::PbuStid => PBU_STID,
-            STID::PcuStid => PCU_STID,
-            STID::PiuStid => PIU_STID,
-            STID::OverrideStid => OVERRIDE_STID,
-        }
+fn matchSTID(typ: STID) -> u8 {
+    match typ {
+        STID::PduStid => PDU_STID,
+        STID::PbuStid => PBU_STID,
+        STID::PcuStid => PCU_STID,
+        STID::PiuStid => PIU_STID,
+        STID::OverrideStid => OVERRIDE_STID,
     }
+}
+
 impl EPS {
 
-    
-
+    // USE THIS AS TEST FUNCTION
     pub fn sys_reset(&self, typ: STID) -> epsResult<()> {
 
         let RST_KEY: u8 = 0xA6; // Reset key

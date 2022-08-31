@@ -1,5 +1,5 @@
 [package]
-name = "isis_eps_api_v2"
+name = "isis-eps-api-v2"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,5 +16,4 @@ rust-uart = { git = "ssh://git@github.com/Cube-OS/rust-uart.git" }
 rust-i2c = { git = "ssh://git@github.com/Cube-OS/rust-i2c.git" }
 rust-spi = { git = "ssh://git@github.com/Cube-OS/rust-spi.git" }
 rust-udp = { git = "ssh://git@github.com/Cube-OS/rust-udp.git" }
-
-
+isis-eps-service-v2 = { git = "ssh://git@github.com/Oscar-Ansted/isis-eps-service-v2}
