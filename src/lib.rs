@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::time::Duration;
 use std::thread;
 use serial::*;
-use isis_eps_service_v2::*; // move git address to cubeos
+use fail::*;
 
 // ID's
 const PDU_STID: u8 = 0x11;
