@@ -248,7 +248,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -259,12 +259,12 @@ impl EPS {
         let CC: u8 = 0x02;
         let cmd: u8 = matchSTID(typ);
         let data: Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID].to_vec();
-        let command = Command{cmd, data}; // i2c command 
+        let command = Command{cmd, data}; // i2c command    
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -280,7 +280,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -296,7 +296,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -315,7 +315,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -339,7 +339,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -366,7 +366,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -387,7 +387,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -422,7 +422,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
@@ -441,7 +441,7 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
-        match self.i2c.connection.transfer(command, rx_len, delay) {
+        match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => Ok(x),
             Err(e) => Err(Error::TransferError),
         }
