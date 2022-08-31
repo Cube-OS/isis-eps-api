@@ -132,7 +132,7 @@ pub enum Error {
 pub type epsResult<T> = Result<T, Error>;
 
 pub struct EPS {
-    i2c_connection: I2c,
+    i2c: I2c,
     buffer: RefCell<Vec<u8>>,
 }
 
