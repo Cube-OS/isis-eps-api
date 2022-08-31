@@ -3,7 +3,7 @@ use rust_i2c::{Command, Connection as I2c};
 use std::cell::RefCell;
 use std::time::Duration;
 use std::thread;
-use serial::*;
+// use serial::*;
 use failure::*;
 
 // ID's
