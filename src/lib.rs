@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::time::Duration;
 use std::thread;
 use serial::*;
-use fail::*;
+use failure::*;
 
 // ID's
 const PDU_STID: u8 = 0x11;
