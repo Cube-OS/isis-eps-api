@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::time::Duration;
 use std::thread;
 // use serial::*;
-use failure::*;
+use failure::Fail;
 
 // ID's
 const PDU_STID: u8 = 0x11;
@@ -208,14 +208,14 @@ pub struct EPSOutput {
 // Most other functions return the STAT parameter. Write function here to check the the STAT for the error code
 fn matchSTAT(typ: u8) -> epsResult<()> { // is it <T, Error> ?
     match typ {
-        0x00 => Ok(),
-        0x01 => Error::RejectedError,
-        0x02 => Error::RejectedInvalidCommandCodeError,
-        0x03 => Error::RejectedParameterMissingError,
-        0x04 => Error::RejectedParameterInvalidError,
-        0x05 => Error::RejectedUnavailableError,
-        0x06 => Error::RejectedInvalidError,
-        0x07 => Error::InternalProcessingError,
+        0x00 => Ok(()),
+        0x01 => Err(Error::RejectedError),
+        0x02 => Err(Error::RejectedInvalidCommandCodeError),
+        0x03 => Err(Error::RejectedParameterMissingError),
+        0x04 => Err(Error::RejectedParameterInvalidError),
+        0x05 => Err(Error::RejectedUnavailableError),
+        0x06 => Err(Error::RejectedInvalidError),
+        0x07 => Err(Error::InternalProcessingError),
         // Reserved values: 0x10, 0x20, 0x40
         // NEW 0x80 set when the response is read for the first time
     }
