@@ -209,13 +209,13 @@ pub struct EPSOutput {
 fn matchSTAT(typ: u8) -> epsResult<()> { // is it <T, Error> ?
     match typ {
         0x00 => Ok(),
-        0x01 => RejectedError,
-        0x02 => RejectedInvalidCommandCodeError,
-        0x03 => RejectedParameterMissingError,
-        0x04 => RejectedParameterInvalidError,
-        0x05 => RejectedUnavailableError,
-        0x06 => RejectedInvalidError,
-        0x07 => InternalProcessingError,
+        0x01 => Error::RejectedError,
+        0x02 => Error::RejectedInvalidCommandCodeError,
+        0x03 => Error::RejectedParameterMissingError,
+        0x04 => Error::RejectedParameterInvalidError,
+        0x05 => Error::RejectedUnavailableError,
+        0x06 => Error::RejectedInvalidError,
+        0x07 => Error::InternalProcessingError,
         // Reserved values: 0x10, 0x20, 0x40
         // NEW 0x80 set when the response is read for the first time
     }
