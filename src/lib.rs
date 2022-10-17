@@ -105,6 +105,7 @@ pub enum DATA_REQUEST {
 }
 
 // Error list
+#[derive(Debug, Fail, Clone, PartialEq)]
 pub enum Error {
     #[fail(display = "Transfer error")]
     TransferError,
@@ -215,7 +216,7 @@ fn matchSTAT(typ: u8) -> epsResult<()> { // is it <T, Error> ?
         0x04 => Err(Error::RejectedParameterInvalidError),
         0x05 => Err(Error::RejectedUnavailableError),
         0x06 => Err(Error::RejectedInvalidError),
-        0x07 => Err(Error::InternalProcessingError),
+        _ => Err(Error::InternalProcessingError),
         // Reserved values: 0x10, 0x20, 0x40
         // NEW 0x80 set when the response is read for the first time
     }
@@ -249,7 +250,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
     }
@@ -265,7 +266,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
     }
@@ -281,7 +282,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
     }
@@ -297,7 +298,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
     }
@@ -316,7 +317,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
 
@@ -340,7 +341,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
     }
@@ -350,7 +351,7 @@ impl EPS {
 
         // Check if rejection index error occurs within ISIS
         if OBC_IDX > 0x09 {
-            Err(Error::BitflagError);
+            return Err::<(),Error>(Error::BitflagError);
         }
 
         let CC: u8 = match typ_channel {
@@ -367,7 +368,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
 
@@ -388,7 +389,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
 
@@ -423,7 +424,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
 
@@ -442,7 +443,7 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(x),
+            Ok(x) => Ok(()),
             Err(e) => Err(Error::TransferError),
         }
 
