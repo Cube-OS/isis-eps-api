@@ -161,14 +161,14 @@ pub struct EpsInput {
 
 // Define the complex datatypes here ------------------------------------------
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
-pub struct VIPData {
+pub struct VIPdata {
     volt: i16,
     curr: i16,
     pwr: i16,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
-pub struct CmdCodeSdata {
+pub struct CmdCodeSPdata {
     volt_in_mppt: u16,
     curr_in_mppt: u16,
     volt_out_mppt: u16,
@@ -182,8 +182,8 @@ pub struct EpsOutput {
     // reserved: u8,-----
     pub volt_brdsup: u16,
     pub temp: u16,
-    pub vip_dist_input: VIPData,
-    pub vip_bat_input: VIPData,
+    pub vip_dist_input: VIPdata,
+    pub vip_bat_input: VIPdata,
     pub stat_obc_on: u16,
     pub stat_obc_ocf: u16,
     pub bat_stat: u16,
@@ -192,26 +192,26 @@ pub struct EpsOutput {
     pub volt_vd0: u16,
     pub volt_vd1: u16,
     pub volt_vd2: u16,
-    pub vip_obc01: VIPData,
-    pub vip_obc02: VIPData,
-    pub vip_obc03: VIPData,
-    pub vip_obc04: VIPData,
-    pub vip_obc05: VIPData,
-    pub vip_obc06: VIPData,
-    pub vip_obc07: VIPData,
-    pub vip_obc08: VIPData,
-    pub cc1: CmdCodeSdata,
-    pub cc2: CmdCodeSdata,
-    pub cc3: CmdCodeSdata,
+    pub vip_obc01: VIPdata,
+    pub vip_obc02: VIPdata,
+    pub vip_obc03: VIPdata,
+    pub vip_obc04: VIPdata,
+    pub vip_obc05: VIPdata,
+    pub vip_obc06: VIPdata,
+    pub vip_obc07: VIPdata,
+    pub vip_obc08: VIPdata,
+    pub cc1: CmdCodeSPdata,
+    pub cc2: CmdCodeSPdata,
+    pub cc3: CmdCodeSPdata,
     // below here are the daughterboard items, n/a if no daughterboard
-    pub vip_obc09: VIPData,
-    pub vip_obc10: VIPData,
-    pub vip_obc11: VIPData,
-    pub vip_obc12: VIPData,
-    pub vip_obc13: VIPData,
-    pub vip_obc14: VIPData,
-    pub cc4: CmdCodeSdata,
-    pub cc5: CmdCodeSdata,
+    pub vip_obc09: VIPdata,
+    pub vip_obc10: VIPdata,
+    pub vip_obc11: VIPdata,
+    pub vip_obc12: VIPdata,
+    pub vip_obc13: VIPdata,
+    pub vip_obc14: VIPdata,
+    pub cc4: CmdCodeSPdata,
+    pub cc5: CmdCodeSPdata,
     // DO I ALSO ADD THE OTHER OUTPUTS FOR MISCELLANEOUS RETURNING FUNCTIONS
 }
 
