@@ -147,9 +147,9 @@ pub struct EPS {
 // Input/Output Structs
 // Could just define these as types
 // pub type timeCorrection = i32;
-// pub type OBC_BF = u16;
-// pub type OBC_IDX = u8;
-// pub type ROS = u8;
+// pub type obc_bf = u16;
+// pub type obc_idx = u8;
+// pub type ros = u8;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct EpsInput {
@@ -168,7 +168,7 @@ pub struct VIPData {
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
-pub struct CCSData {
+pub struct CmdCodeSdata {
     volt_in_mppt: u16,
     curr_in_mppt: u16,
     volt_out_mppt: u16,
@@ -180,45 +180,43 @@ pub struct EpsOutput {
     // Most functions only require STAT and the rest is N/A-----
     pub stat: u8,
     // reserved: u8,-----
-    pub VOLT_BRDSUP: u16,
-    pub TEMP: u16,
-    pub VIP_DIST_INPUT: VIPData,
-    pub VIP_BAT_INPUT: VIPData,
-    pub STAT_OBC_ON: u16,
-    pub STAT_OBC_OCF: u16,
-    pub BAT_STAT: u16,
-    pub BAT_TEMP2: u16,
-    pub BAT_TEMP3: u16,
-    pub VOLT_VD0: u16,
-    pub VOLT_VD1: u16,
-    pub VOLT_VD2: u16,
-    pub VIP_OBC01: VIPData,
-    pub VIP_OBC02: VIPData,
-    pub VIP_OBC03: VIPData,
-    pub VIP_OBC04: VIPData,
-    pub VIP_OBC05: VIPData,
-    pub VIP_OBC06: VIPData,
-    pub VIP_OBC07: VIPData,
-    pub VIP_OBC08: VIPData,
-    pub CC1: CCSData,
-    pub CC2: CCSData,
-    pub CC3: CCSData,
-    // Below here are the daughterboard items, N/A if no daughterboard
-    pub VIP_OBC09: VIPData,
-    pub VIP_OBC10: VIPData,
-    pub VIP_OBC11: VIPData,
-    pub VIP_OBC12: VIPData,
-    pub VIP_OBC13: VIPData,
-    pub VIP_OBC14: VIPData,
-    pub CC4: CCSData,
-    pub CC5: CCSData,
-
+    pub volt_brdsup: u16,
+    pub temp: u16,
+    pub vip_dist_input: VIPData,
+    pub vip_bat_input: VIPData,
+    pub stat_obc_on: u16,
+    pub stat_obc_ocf: u16,
+    pub bat_stat: u16,
+    pub bat_temp2: u16,
+    pub bat_temp3: u16,
+    pub volt_vd0: u16,
+    pub volt_vd1: u16,
+    pub volt_vd2: u16,
+    pub vip_obc01: VIPData,
+    pub vip_obc02: VIPData,
+    pub vip_obc03: VIPData,
+    pub vip_obc04: VIPData,
+    pub vip_obc05: VIPData,
+    pub vip_obc06: VIPData,
+    pub vip_obc07: VIPData,
+    pub vip_obc08: VIPData,
+    pub cc1: CmdCodeSdata,
+    pub cc2: CmdCodeSdata,
+    pub cc3: CmdCodeSdata,
+    // below here are the daughterboard items, n/a if no daughterboard
+    pub vip_obc09: VIPData,
+    pub vip_obc10: VIPData,
+    pub vip_obc11: VIPData,
+    pub vip_obc12: VIPData,
+    pub vip_obc13: VIPData,
+    pub vip_obc14: VIPData,
+    pub cc4: CmdCodeSdata,
+    pub cc5: CmdCodeSdata,
     // DO I ALSO ADD THE OTHER OUTPUTS FOR MISCELLANEOUS RETURNING FUNCTIONS
-
 }
 
 // Most other functions return the STAT parameter. Write function here to check the the STAT for the error code
-fn matchSTAT(typ: u8) -> EpsResult<()> { // is it <T, Error> ?
+fn match_stat(typ: u8) -> EpsResult<()> { // is it <T, Error> ?
     match typ {
         0x00 => Ok(()),
         0x01 => Err(EpsError::RejectedError),
@@ -235,7 +233,7 @@ fn matchSTAT(typ: u8) -> EpsResult<()> { // is it <T, Error> ?
 
 
 // STID match shortcut
-fn matchStID(typ: StID) -> u8 {
+fn match_st_id(typ: StID) -> u8 {
     match typ {
         StID::PduStid => PDU_STID,
         StID::PbuStid => PBU_STID,
@@ -250,128 +248,128 @@ impl EPS {
     // USE THIS AS TEST FUNCTION
     pub fn sys_reset(&self, typ: StID) -> EpsResult<()> {
 
-        let RST_KEY: u8 = 0xA6; // Reset key
-        let CC: u8 = 0xAA; // command code
-        let cmd: u8 = matchStID(typ);
+        let ret_key: u8 = 0xA6; // Reset key
+        let cmd_code: u8 = 0xAA; // command code
+        let cmd: u8 = match_st_id(typ);
 
-        let data: Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID, RST_KEY].to_vec();
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, ret_key].to_vec();
         let command = Command{cmd, data}; // i2c command 
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     pub fn no_op(&self, typ:StID) -> EpsResult<()> {
         
-        let CC: u8 = 0x02;
-        let cmd: u8 = matchStID(typ);
-        let data: Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID].to_vec();
+        let cmd_code: u8 = 0x02;
+        let cmd: u8 = match_st_id(typ);
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data}; // i2c command    
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     pub fn cancel_op(&self, typ:StID) -> EpsResult<()> {
         
-        let CC: u8 = 0x04;
-        let cmd: u8 = matchStID(typ);
-        let data: Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID].to_vec();
+        let cmd_code: u8 = 0x04;
+        let cmd: u8 = match_st_id(typ);
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data}; // i2c command 
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     pub fn watchdog(&self, typ:StID) -> EpsResult<()> {
         
-        let CC: u8 = 0x06;
-        let cmd: u8 = matchStID(typ);
-        let data: Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID].to_vec();
+        let cmd_code: u8 = 0x06;
+        let cmd: u8 = match_st_id(typ);
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data}; // i2c command 
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     // This requires a hexadecimal input, is this even useful? (extra input is i32)
-    pub fn correct_time(&self, typ: StID, timeCorrection: i32) -> EpsResult<()> {
+    pub fn correct_time(&self, typ: StID, time_correction: i32) -> EpsResult<()> {
         
-        let CC: u8 = 0x08;
-        let cmd: u8 = matchStID(typ);
+        let cmd_code: u8 = 0x08;
+        let cmd: u8 = match_st_id(typ);
 
-        let mut timeCorrection_bytes = timeCorrection.to_le_bytes();
-        let data = [&[ALL_IVID, CC, OVERRIDE_BID], &timeCorrection_bytes[..]].concat();
+        let time_correction_bytes = time_correction.to_le_bytes();
+        let data = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &time_correction_bytes[..]].concat();
         let command = Command{cmd, data};
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
 
     }
 
     // Rejects non-existent bus channels and groups (extra input is u16)
-    pub fn bus_group(&self, typ_stid: StID, typ_group: BusGroup, OBC_BF: u16) -> EpsResult<()> {
+    pub fn bus_group(&self, typ_stid: StID, typ_group: BusGroup, obc_bf: u16) -> EpsResult<()> {
         // Match correct command arg
-        let CC: u8 = match typ_group {
+        let cmd_code: u8 = match typ_group {
             BusGroup::BusGroupOn => OUTPUT_BUS_CHANNEL_ON,
             BusGroup::BusGroupOff => OUTPUT_BUS_GROUP_OFF,
             BusGroup::BusGroupState => OUTPUT_BUS_GROUP_STATE,
         };
 
-        let cmd: u8 = matchStID(typ_stid);
-        let group_bytes = OBC_BF.to_le_bytes(); // use little endian for ISIS
-        let data:Vec<u8> = [&[ALL_IVID, CC, OVERRIDE_BID], &group_bytes[..]].concat();
+        let cmd: u8 = match_st_id(typ_stid);
+        let group_bytes = obc_bf.to_le_bytes(); // use little endian for ISIS
+        let data:Vec<u8> = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &group_bytes[..]].concat();
         let command = Command{cmd, data};
         // Send command
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     // Non-existent bus channel index will be rejected (so we can check here if this is procked in ISIS and present the error)
-    pub fn bus_channel(&self, typ_stid: StID, typ_channel: BusChannel, OBC_IDX: u8) -> EpsResult<()> {
+    pub fn bus_channel(&self, typ_stid: StID, typ_channel: BusChannel, obc_idx: u8) -> EpsResult<()> {
 
         // Check if rejection index error occurs within ISIS
-        if OBC_IDX > 0x09 {
+        if obc_idx > 0x09 {
             return Err::<(),EpsError>(EpsError::BitflagError);
         }
 
-        let CC: u8 = match typ_channel {
+        let cmd_code: u8 = match typ_channel {
             BusChannel::BusChannelOn => OUTPUT_BUS_CHANNEL_ON,
             BusChannel::BusChannelOff => OUTPUT_BUS_CHANNEL_OFF,
         };
 
-        let cmd: u8 = matchStID(typ_stid);
-        let data:Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID, OBC_IDX].to_vec();
+        let cmd: u8 = match_st_id(typ_stid);
+        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, obc_idx].to_vec();
         let command = Command{cmd, data};
 
         // Send command
@@ -379,20 +377,20 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
 
     }
 
     pub fn mode_switch(&self, typ_stid: StID, typ_mode: ModeSwitch) -> EpsResult<()> {
-        let CC: u8 = match typ_mode {
+        let cmd_code: u8 = match typ_mode {
             ModeSwitch::Nominal => SWITCH_TO_NOMINAL_MODE,
             ModeSwitch::Safety => SWITCH_TO_SAFETY_MODE,
         };
 
-        let cmd: u8 = matchStID(typ_stid);
-        let data:Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID].to_vec();
+        let cmd: u8 = match_st_id(typ_stid);
+        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data};
 
         // Send command
@@ -400,15 +398,15 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
 
     }
 
     // Data Request Function
     pub fn data_request(&self, typ_stid: StID, typ_data: DataRequest) -> EpsResult<()> {
-        let CC: u8 = match typ_data {
+        let cmd_code: u8 = match typ_data {
             DataRequest::SystemStatus => GET_SYS_STATUS,
             DataRequest::PDUOvercurrent => GET_PDU_OC_FAULT_STATE,
             DataRequest::PBUABFPlacedState => GET_PBU_ABF_PLACED_STATE,
@@ -426,8 +424,8 @@ impl EPS {
             DataRequest::PIUAvgHK => GET_PIU_HK_DATA_AVRG,
         };
 
-        let cmd: u8 = matchStID(typ_stid);
-        let data:Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID].to_vec();
+        let cmd: u8 = match_st_id(typ_stid);
+        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data};
 
         // Send command
@@ -435,18 +433,18 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
 
     }
 
     // Configuration commands here 
     // (extra input is u8)
-    pub fn read_response_part(&self, typ_stid: StID, ROS: u8) -> EpsResult<()> {
-        let CC: u8 = 0xC2;
-        let cmd: u8 = matchStID(typ_stid);
-        let data:Vec<u8> = [ALL_IVID, CC, OVERRIDE_BID, ROS].to_vec();
+    pub fn read_response_part(&self, typ_stid: StID, ros: u8) -> EpsResult<()> {
+        let cmd_code: u8 = 0xC2;
+        let cmd: u8 = match_st_id(typ_stid);
+        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, ros].to_vec();
         let command = Command{cmd, data};
 
         // Send command
@@ -454,8 +452,8 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => Ok(()),
-            Err(e) => Err(EpsError::TransferError),
+            Ok(_x) => Ok(()),
+            Err(_e) => Err(EpsError::TransferError),
         }
 
     }
