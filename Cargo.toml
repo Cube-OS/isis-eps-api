@@ -1,5 +1,5 @@
 [package]
-name = "isis-eps-api-v2"
+name = "isis-eps-api"
 version = "0.1.0"
 edition = "2021"
 
