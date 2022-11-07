@@ -175,10 +175,10 @@ pub struct EPS {
 impl EPS {
 
     // No-operation. Check system availability, without changing anything 
-    pub fn eps_ping(&self, typ:StID) -> EpsResult<()> {
+    pub fn eps_ping(&self, typ_stid:StID) -> EpsResult<()> {
 
         let cmd_code: u8 = NO_OP;
-        let cmd: u8 = match_st_id(typ);
+        let cmd: u8 = match_st_id(typ_stid);
         let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data}; // i2c command    
 
@@ -192,11 +192,11 @@ impl EPS {
     }
     
     // Software reset. A reply to this command will not always be retrievable (system will shut down after this)
-    pub fn sys_reset(&self, typ: StID, ret_key: u8) -> EpsResult<()> {
+    pub fn sys_reset(&self, typ_stid: StID, ret_key: u8) -> EpsResult<()> {
 
         // let ret_key: u8 = 0xA6; // Reset key
         let cmd_code: u8 = SYS_RESET; // command code
-        let cmd: u8 = match_st_id(typ);
+        let cmd: u8 = match_st_id(typ_stid);
         
         // The value of ret_key needs to be set to 0xA6 for the command to be accepted.
         let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, ret_key].to_vec();
@@ -214,10 +214,10 @@ impl EPS {
 
     // Switches off any command-enable output bus channels. 
     // All force-enable channels will remain enabled.
-    pub fn shutdown_all(&self, typ:StID) -> EpsResult<()> {
+    pub fn shutdown_all(&self, typ_stid:StID) -> EpsResult<()> {
         
         let cmd_code: u8 = CANCEL_OP;
-        let cmd: u8 = match_st_id(typ);
+        let cmd: u8 = match_st_id(typ_stid);
         let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data}; // i2c command 
 
@@ -232,10 +232,10 @@ impl EPS {
 
     // Resets the watchdog timer keeping the system from performing a reset (0x06)
     // Note tha any traffic with the system implicitly performs a watchdog reset. 
-    pub fn watchdog_reset(&self, typ:StID) -> EpsResult<()> {
+    pub fn watchdog_reset(&self, typ_stid:StID) -> EpsResult<()> {
         
         let cmd_code: u8 = WATCHDOG;
-        let cmd: u8 = match_st_id(typ);
+        let cmd: u8 = match_st_id(typ_stid);
         let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID].to_vec();
         let command = Command{cmd, data}; // i2c command 
 
@@ -575,7 +575,7 @@ impl EPS {
      
     // Correct the unit’s unix time with the specified amount of seconds.
     // unix time value is returned as part of the “0x40 (0x41) – Get System Status” response, 
-    pub fn correct_time(&self, typ: StID, time_correction: i32) -> EpsResult<()> {
+    pub fn correct_time(&self, typ_stid: StID, time_correction: i32) -> EpsResult<()> {
         
         let cmd_code: u8 = CORRECT_TIME;
         let cmd: u8 = match_st_id(typ);
@@ -595,7 +595,7 @@ impl EPS {
     }
 
     //  Write all reset cause counters to zero in persistent memory (0xC6)
-    pub fn reset_all_counters(&self, typ:StID, zero_key:u8) -> EpsResult<()> {
+    pub fn reset_all_counters(&self, typ_stid:StID, zero_key:u8) -> EpsResult<()> {
         
         let cmd_code: u8 = RST_CAUSE_CNTR;
         let cmd: u8 = match_st_id(typ);
