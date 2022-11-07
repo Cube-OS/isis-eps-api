@@ -578,7 +578,7 @@ impl EPS {
     pub fn correct_time(&self, typ_stid: StID, time_correction: i32) -> EpsResult<()> {
         
         let cmd_code: u8 = CORRECT_TIME;
-        let cmd: u8 = match_st_id(typ);
+        let cmd: u8 = match_st_id(typ_stid);
 
         let time_correction_bytes = time_correction.to_le_bytes();
         let data = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &time_correction_bytes[..]].concat();
@@ -598,7 +598,7 @@ impl EPS {
     pub fn reset_all_counters(&self, typ_stid:StID, zero_key:u8) -> EpsResult<()> {
         
         let cmd_code: u8 = RST_CAUSE_CNTR;
-        let cmd: u8 = match_st_id(typ);
+        let cmd: u8 = match_st_id(typ_stid);
 
         // Zero key: 0xA7. Any other value causes this command to be rejected with a parameter error
         // XL: Not sure why zero_key is defined as i32 in manual, to be tested
