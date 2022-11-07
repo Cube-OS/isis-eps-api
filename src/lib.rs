@@ -1,5 +1,4 @@
-#![deny(missing_docs)]
-#[macro_use]
+// #![deny(missing_docs)]
 extern crate juniper;
 
 pub use crate::eps::*;

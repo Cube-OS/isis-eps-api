@@ -23,13 +23,14 @@
 
 // Dependancies
 use rust_i2c::{Command, Connection as I2c};
-use std::cell::RefCell;
 use std::time::Duration;
-use std::thread;
 use crate::objects::*;
-// use serial::*;
 use failure::Fail;
 use serde::*;
+// use std::cell::RefCell;
+// use std::thread;
+// use serial::*;
+
 
 // ID's
 const PDU_STID: u8 = 0x11;
@@ -38,10 +39,10 @@ const PCU_STID: u8 = 0x13;
 const PIU_STID: u8 = 0x1A;
 const OVERRIDE_STID: u8 = 0x00;
 const ALL_IVID: u8 = 0x06;
-const OVERRIDE_IVID: u8 = 0x00;
-const PDU_BID: u8 = 0x00;
-const PBU_BID: u8 = 0x00;
-const PCU_BID: u8 = 0x00;
+// const OVERRIDE_IVID: u8 = 0x00;
+// const PDU_BID: u8 = 0x00;
+// const PBU_BID: u8 = 0x00;
+// const PCU_BID: u8 = 0x00;
 const OVERRIDE_BID: u8 = 0x00;
 
 // System Operational command 
@@ -87,11 +88,9 @@ const LOAD_CONFIG: u8 = 0x92;
 const SAVE_CONFIG: u8 = 0x94;
 
 // Data request commands
-const GET_PIU_HK_DATA_RAW: u8 = 0xA0;
+// const GET_PIU_HK_DATA_RAW: u8 = 0xA0;
 const GET_PIU_HK_DATA_ENG: u8 = 0xA2;
 const GET_PIU_HK_DATA_AVRG: u8 = 0xA4;
-
-
 
 // Error list
 #[derive(Debug, Fail, Serialize, Deserialize, Clone, PartialEq)]
@@ -100,6 +99,9 @@ pub enum EpsError {
     TransferError,
     #[fail(display = "InvalidInput error")]
     InvalidInput,
+    // Errors from deserialization
+    #[fail(display = "bincode Error")]
+    Bincode(u8),
     // Response Status Information (STAT) Errors
     #[fail(display = "Rejected")]
     Rejected,
@@ -115,6 +117,22 @@ pub enum EpsError {
     InvalidSystemType,
     #[fail(display = "Internal error occurred during processing")]
     InternalProcessing,
+}
+
+impl From<bincode::Error> for EpsError {
+    fn from(b: bincode::Error) -> EpsError {
+        match *b {
+            bincode::ErrorKind::Io(_) => EpsError::Bincode(0),
+            bincode::ErrorKind::InvalidUtf8Encoding(_) => EpsError::Bincode(1),
+            bincode::ErrorKind::InvalidBoolEncoding(_) => EpsError::Bincode(2),
+            bincode::ErrorKind::InvalidCharEncoding => EpsError::Bincode(3),
+            bincode::ErrorKind::InvalidTagEncoding(_) => EpsError::Bincode(4),
+            bincode::ErrorKind::DeserializeAnyNotSupported => EpsError::Bincode(5),
+            bincode::ErrorKind::SizeLimit => EpsError::Bincode(6),
+            bincode::ErrorKind::SequenceMustHaveLength => EpsError::Bincode(7),
+            bincode::ErrorKind::Custom(_) => EpsError::Bincode(8),            
+        }
+    }
 }
 
 // Most other functions return the STAT parameter. Write function here to check the the STAT for the error code
@@ -152,7 +170,6 @@ pub type EpsResult<T> = Result<T, EpsError>;
 
 pub struct EPS {
     i2c: I2c,
-    buffer: RefCell<Vec<u8>>,
 }
 
 impl EPS {
@@ -231,21 +248,22 @@ impl EPS {
         }
     }
 
-    // Turn-on/off output bus channels with bitflag, leave unmarked unaltered. LSB bit corresponds to bus channel 0 (CH0),
+    // Turn-on/off output bus channels with bitflag, leave unmarked unaltered. （0x10,0x12,0x14）
+    // LSB bit corresponds to bus channel 0 (CH0),
     pub fn set_group_outputs(&self, typ_stid: StID, typ_group: BusGroup, eps_bitflag: u16) -> EpsResult<()> {
         // Match correct command arg
         let cmd_code: u8 = match typ_group {
-            BusGroup::BusGroupOn => OUTPUT_BUS_CHANNEL_ON,
+            BusGroup::BusGroupOn => OUTPUT_BUS_GROUP_ON,
             BusGroup::BusGroupOff => OUTPUT_BUS_GROUP_OFF,
             BusGroup::BusGroupState => OUTPUT_BUS_GROUP_STATE,
         };
 
         let cmd: u8 = match_st_id(typ_stid);
         let group_bytes = eps_bitflag.to_le_bytes(); // use little endian for ISIS
-        // let data:Vec<u8> = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &group_bytes[..]].concat();
-
         // e.g. 0b1010011 (=0x0503, decimal 83). This switches output bus channels 0, 1, 4 and 6
-        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, &eps_bitflag[..]].to_vec();
+        let data:Vec<u8> = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &group_bytes[..]].concat();
+
+        // let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, group_bytes[0], group_bytes[1]].to_vec();
         let command = Command{cmd, data};
         // Send command
         let rx_len = 5;
@@ -257,7 +275,7 @@ impl EPS {
         }
     }
 
-    // Turn a single output bus channel on using the bus channel index. 
+    // Turn a single output bus channel on using the bus channel index. (0x16,0x18)
     // e.g. Index 0 represents channel 0 (CH0)
     pub fn set_single_output(&self, typ_stid: StID, typ_channel: BusChannel, eps_ch_idx: u8) -> EpsResult<()> {
 
@@ -323,7 +341,7 @@ impl EPS {
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 match match_stat(x[4]){
-                    Ok(()) => Ok(bincode::deserialize::<SystemStatus>(x[5..])?),
+                    Ok(()) => Ok(bincode::deserialize::<SystemStatus>(&x[5..])?),
                     Err(e) => Err(e),
                 }                 
             }
@@ -357,7 +375,7 @@ impl EPS {
     }
 
     // 0x44  – Get ABF Placed State
-    pub fn ABFState(&self, typ_stid: StID) -> EpsResult<(ABFState)> {
+    pub fn abf_state(&self, typ_stid: StID) -> EpsResult<ABFState> {
         let cmd_code: u8 = GET_PBU_ABF_PLACED_STATE;
 
         let cmd: u8 = match_st_id(typ_stid);
@@ -476,7 +494,7 @@ impl EPS {
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 match match_stat(x[4]){
-                    Ok(()) => Ok(bincode::deserialize::<PIUHk>(x[6..184])?),
+                    Ok(()) => Ok(bincode::deserialize::<PIUHk>(&x[6..184])?),
                     Err(e) => Err(e),
                 }                 
             }
@@ -486,7 +504,8 @@ impl EPS {
     } 
 
     // 0x82/0x84/0x86 Get/Set/Reset Configuration commands 
-    pub fn system_config_command(&self, typ_stid: StID, mode: SysConfig1, para_id: u16) -> EpsResult<vec<u8>> {
+    // XL: Not sure how to handle the return
+    pub fn system_config_command(&self, typ_stid: StID, mode: SysConfig1, para_id: u16) -> EpsResult<Vec<u8>> {
 
         let cmd_code: u8 = match mode {
             SysConfig1::GetConfigParam => GET_CONFIG_PARA,
@@ -494,11 +513,14 @@ impl EPS {
             SysConfig1::ResetConfigParam => RESET_CONFIG_PARA,
         };
         let cmd: u8 = match_st_id(typ_stid);
-        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, &para_id[..]].to_vec();
-        let command = Command{cmd, data};
-        let mut param_size = 0;
+        let para_id_bytes = para_id.to_le_bytes(); // use little endian for ISIS
+        println!("{:?}", para_id_bytes);
+        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, para_id_bytes[0], para_id_bytes[1]].to_vec();
 
-        match param_id[0] {
+        let command = Command{cmd, data};
+        let param_size;
+
+        match para_id_bytes[1] {
             0x10 => param_size = 1, 
             0x20 => param_size = 1,  
             0x30 => param_size = 2, 
@@ -509,6 +531,7 @@ impl EPS {
             0x80 => param_size = 8, 
             0x90 => param_size = 8, 
             0xA0 => param_size = 8, 
+            _=> return Err(EpsError::InvalidInput),
         } 
 
         // Send command
@@ -518,7 +541,7 @@ impl EPS {
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 match match_stat(x[4]){
-                    Ok(()) => Ok(x[6..]),
+                    Ok(()) => Ok(x[6..].to_vec()),
                     Err(e) => Err(e),
                 }                 
             }            
@@ -528,7 +551,7 @@ impl EPS {
     }
 
     // 0x90 Reset a parameter to its default hard-coded value. 
-    pub fn reset_all_conf(&self, typ_stid: StID, mode: SysConfig2, config_key: u8) -> EpsResult<Vec<u8>> {
+    pub fn reset_all_conf(&self, typ_stid: StID, mode: SysConfig2, config_key: u8) -> EpsResult<()> {
        // XL let cmd_code: u8 = RESET_CONFIG;
        let cmd_code: u8 = match mode {
             SysConfig2::ResetAll => RESET_CONFIG_ALL,
@@ -572,13 +595,13 @@ impl EPS {
     }
 
     //  Write all reset cause counters to zero in persistent memory (0xC6)
-    pub fn reset_all_counters(&self, typ:StID, zero_key:i32) -> EpsResult<()> {
+    pub fn reset_all_counters(&self, typ:StID, zero_key:u8) -> EpsResult<()> {
         
         let cmd_code: u8 = RST_CAUSE_CNTR;
         let cmd: u8 = match_st_id(typ);
 
         // Zero key: 0xA7. Any other value causes this command to be rejected with a parameter error
-        // XL: Not sure why zero_key is i32, to be tested
+        // XL: Not sure why zero_key is defined as i32 in manual, to be tested
         let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, zero_key].to_vec();
         let command = Command{cmd, data}; // i2c command 
 
@@ -590,7 +613,7 @@ impl EPS {
             Err(_e) => Err(EpsError::TransferError),
         }
     }
-    
+
 }
 
 

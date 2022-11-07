@@ -79,16 +79,15 @@ pub enum ConfStatus {
 }
 
 // Reset status, used in get system status (0x40)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub enum ResetCause {
-    PowerOn,
-    Watchdog,
-    Commanded,
-    EpsUpset,
-    EmergLowPwr,
-}
+// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+// pub enum ResetCause {
+//     PowerOn,
+//     Watchdog,
+//     Commanded,
+//     EpsUpset,
+//     EmergLowPwr,
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PDUHkSel {
     // PDURawHK,
     PDUEngHK,
@@ -124,15 +123,6 @@ pub enum SysConfig2 {
     LoadConfig, 
     SaveConfig, 
 }
-
-// Input/Output Structs
-pub type time_correction = i32;
-// Bitflag field indicating which output bus channels (0 - 15) to turn-on. 
-pub type eps_bitflag = u16;
-// Bus channel index of the channel to turn on.
-pub type eps_ch_idx = u8;
-// XL : read_response_part
-pub type para_id = u16;
  
 // The voltage V - current I - power P datatype (VIPD) raw data. 
 // Used in blocks across the HK telemetry.
@@ -265,6 +255,7 @@ pub struct SystemStatus {
     // Calendar second of UNIX_second
     unix_second: u8,
 }
+
 
 // Overcurrent Fault State （0x42）
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
