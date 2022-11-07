@@ -174,6 +174,20 @@ pub struct EPS {
 
 impl EPS {
 
+    pub fn new(
+        i2c_path: String,
+        i2c_addr: u16,
+        // API's Listener Address
+        udp_path: String,
+        // Payload Address
+        udp_to: String,
+    ) -> EpsResult<Self> {
+        Ok(Self{
+            i2c: I2c::from_path(&i2c_path,i2c_addr),
+        })
+    }
+
+
     // No-operation. Check system availability, without changing anything 
     pub fn eps_ping(&self, typ_stid:StID) -> EpsResult<()> {
 
