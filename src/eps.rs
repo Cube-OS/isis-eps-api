@@ -23,6 +23,8 @@
 
 // Dependancies
 use rust_i2c::{Command, Connection as I2c};
+use rust_udp::{Connection as Udp};
+
 use std::time::Duration;
 use crate::objects::*;
 use failure::Fail;
@@ -203,6 +205,7 @@ pub type EpsResult<T> = Result<T, EpsError>;
 
 pub struct EPS {
     i2c: I2c,
+    udp_connection: Udp,
 }
 
 impl EPS {
@@ -210,13 +213,14 @@ impl EPS {
     pub fn new(
         i2c_path: String,
         i2c_addr: u16,
-        // API's Listener Address
+        // // API's Listener Address
         udp_path: String,
-        // Payload Address
+        // // Payload Address
         udp_to: String,
     ) -> EpsResult<Self> {
         Ok(Self{
             i2c: I2c::from_path(&i2c_path,i2c_addr),
+            udp_connection: Udp::from_path(udp_path, udp_to),
         })
     }
 
