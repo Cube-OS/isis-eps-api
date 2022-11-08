@@ -210,14 +210,7 @@ pub struct EPS {
 
 impl EPS {
     // Basic function to initialise an instance of the EpsStruct 
-    pub fn new(
-        i2c_path: String,
-        i2c_addr: u16,
-        // // API's Listener Address
-        udp_path: String,
-        // // Payload Address
-        udp_to: String,
-    ) -> EpsResult<Self> {
+    pub fn new(i2c_path: String, i2c_addr: u16, udp_path: String, udp_to: String) -> EpsResult<Self> {
         Ok(Self{
             i2c: I2c::from_path(&i2c_path,i2c_addr),
             udp_connection: Udp::from_path(udp_path, udp_to),

@@ -88,36 +88,42 @@ pub enum ConfStatus {
 //     EmergLowPwr,
 // }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PDUHkSel {
     // PDURawHK,
     PDUEngHK,
     PDUAvgHK,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PBUHkSel {
     // PBURawHK,
     PBUEngHK,
     PBUAvgHK,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PCUHkSel {
     // PCURawHK,
     PCUEngHK,
     PCUAvgHK,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PIUHkSel {
     // PIURawHK,
     PIUEngHK,
     PIUAvgHK, 
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum SysConfig1 {
     GetConfigParam, 
     SetConfigParam, 
     ResetConfigParam,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum SysConfig2 {
     ResetAll, 
     LoadConfig, 
