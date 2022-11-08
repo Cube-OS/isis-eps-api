@@ -30,7 +30,9 @@ use serde::*;
 // use std::cell::RefCell;
 // use std::thread;
 // use serial::*;
-
+use juniper::*;
+use std::convert::From;
+use cubeos_error::Error;
 
 // ID's
 const PDU_STID: u8 = 0x11;
@@ -93,8 +95,17 @@ const GET_PIU_HK_DATA_ENG: u8 = 0xA2;
 const GET_PIU_HK_DATA_AVRG: u8 = 0xA4;
 
 // Error list
-#[derive(Debug, Fail, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Fail, Clone, PartialEq)]
 pub enum EpsError {
+    /// Example error
+    #[fail(display = "Eps Error")]
+    Err,
+    /// I2C Error
+    #[fail(display = "I2C Error")]
+    I2CError(std::io::ErrorKind),
+    /// I2C Set Error
+    #[fail(display = "I2C Set Error")]
+    I2CSet,
     #[fail(display = "Transfer error")]
     TransferError,
     #[fail(display = "InvalidInput error")]
@@ -117,6 +128,28 @@ pub enum EpsError {
     InvalidSystemType,
     #[fail(display = "Internal error occurred during processing")]
     InternalProcessing,
+}
+
+/// All Errors in EpsError are converted to cubeos_error::Error::ServiceError(u8)
+impl From<EpsError> for Error {
+    fn from(e: EpsError) -> cubeos_error::Error {
+        match e {
+            EpsError::Err => cubeos_error::Error::ServiceError(0),
+            EpsError::I2CError(io) => cubeos_error::Error::from(io),
+            EpsError::I2CSet => cubeos_error::Error::ServiceError(1),
+            EpsError::TransferError => cubeos_error::Error::ServiceError(2),
+            EpsError::InvalidInput => cubeos_error::Error::ServiceError(3),
+            EpsError::Bincode(io) => cubeos_error::Error::Bincode(io),
+            EpsError::Rejected => cubeos_error::Error::ServiceError(4),
+            EpsError::InvalidCommandCode => cubeos_error::Error::ServiceError(5),
+            EpsError::ParameterMissing => cubeos_error::Error::ServiceError(6),
+            EpsError::Parameterinvalid => cubeos_error::Error::ServiceError(7),
+            EpsError::UnavailableMode => cubeos_error::Error::ServiceError(8),
+            EpsError::InvalidSystemType => cubeos_error::Error::ServiceError(9),
+            EpsError::InternalProcessing => cubeos_error::Error::ServiceError(10),
+            // _ => cubeos_error::Error::ServiceError(0),
+        }
+    }
 }
 
 impl From<bincode::Error> for EpsError {
@@ -173,7 +206,7 @@ pub struct EPS {
 }
 
 impl EPS {
-
+    // Basic function to initialise an instance of the EpsStruct 
     pub fn new(
         i2c_path: String,
         i2c_addr: u16,
