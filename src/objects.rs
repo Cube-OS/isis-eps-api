@@ -25,6 +25,7 @@
 // System Type Identifier (STID)
 
 use serde::*;
+use juniper::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
 pub enum StID {
