@@ -228,6 +228,8 @@ impl EPS {
 
         let rx_len = 5;
         let delay = Duration::from_millis(50);
+        
+        println!{"Eps Ping cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
@@ -270,7 +272,7 @@ impl EPS {
 
         let rx_len = 5;
         let delay = Duration::from_millis(50);
-
+        
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => match_stat(x[4]),
             Err(_e) => Err(EpsError::TransferError),
@@ -288,9 +290,14 @@ impl EPS {
 
         let rx_len = 5;
         let delay = Duration::from_millis(50);
+        
+        println!{"Watchdog reset {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            Ok(x) => {
+                println!{"Eps Ping {:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
