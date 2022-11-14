@@ -230,7 +230,10 @@ impl EPS {
         let delay = Duration::from_millis(50);
 
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            Ok(x) => {
+                println!{"Eps Ping {:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
@@ -303,7 +306,10 @@ impl EPS {
         };
 
         let cmd: u8 = match_st_id(typ_stid);
-        let group_bytes = eps_bitflag.to_le_bytes(); // use little endian for ISIS
+        let group_bytes = eps_bitflag.to_le_bytes(); // use little endian for ISIS{
+                println!{"Eps Ping {:?}",x};
+                match_stat(x[4])
+            }
         // e.g. 0b1010011 (=0x0503, decimal 83). This switches output bus channels 0, 1, 4 and 6
         let data:Vec<u8> = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &group_bytes[..]].concat();
 
