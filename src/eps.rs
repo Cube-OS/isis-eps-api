@@ -174,6 +174,7 @@ impl From<bincode::Error> for EpsError {
 fn match_stat(typ: u8) -> EpsResult<()> { // is it <T, Error> ?
     match typ {
         0x00 => Ok(()),
+        0x80 => Ok(()),
         0x01 => Err(EpsError::Rejected),
         0x02 => Err(EpsError::InvalidCommandCode),
         0x03 => Err(EpsError::ParameterMissing),
@@ -228,12 +229,14 @@ impl EPS {
 
         let rx_len = 5;
         let delay = Duration::from_millis(50);
-        
-        println!{"Eps Ping cmd {:?}",command};
+       
+        #[cfg(feature = "debug")]
+        println!{"Eps Ping Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
-                println!{"Eps Ping {:?}",x};
+                #[cfg(feature = "debug")]
+                println!{"Eps Ping Response{:?}",x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
@@ -253,10 +256,17 @@ impl EPS {
 
         let rx_len = 5;
         let delay = Duration::from_millis(50);
+        
+        #[cfg(feature = "debug")]
+        println!{"System Reset Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             // The (5th byte) responsed need to be parsed with match_stat
-            Ok(x) => match_stat(x[4]),
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Reset Response{:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
@@ -273,8 +283,16 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
         
+        #[cfg(feature = "debug")]
+        println!{"Shutdown All Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            // The (5th byte) responsed need to be parsed with match_stat
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Shutdown All Response{:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
@@ -291,11 +309,14 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
         
-        println!{"Watchdog reset {:?}",command};
+        #[cfg(feature = "debug")]
+        println!{"Watchdog Reset Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
+            // The (5th byte) responsed need to be parsed with match_stat
             Ok(x) => {
-                println!{"Eps Ping {:?}",x};
+                #[cfg(feature = "debug")]
+                println!{"Watchdog Reset Response{:?}",x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
@@ -314,7 +335,7 @@ impl EPS {
 
         let cmd: u8 = match_st_id(typ_stid);
         let group_bytes = eps_bitflag.to_le_bytes(); // use little endian for ISIS{
-            
+
         // e.g. 0b1010011 (=0x0503, decimal 83). This switches output bus channels 0, 1, 4 and 6
         let data:Vec<u8> = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &group_bytes[..]].concat();
 
@@ -324,8 +345,16 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"Set GroupOutput Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            // The (5th byte) responsed need to be parsed with match_stat
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Set GroupOutput Response {:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
@@ -353,8 +382,16 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"Set SingleOutput Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            // The (5th byte) responsed need to be parsed with match_stat
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Set SingleOutput Response {:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
 
@@ -374,8 +411,16 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"Mode Switch Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            // The (5th byte) responsed need to be parsed with match_stat
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Mode Switch Response {:?}",x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
 
@@ -393,8 +438,13 @@ impl EPS {
         let rx_len = 36;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"System Status Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Status Response {:?}", x};
                 match match_stat(x[4]){
                     Ok(()) => Ok(bincode::deserialize::<SystemStatus>(&x[5..])?),
                     Err(e) => Err(e),
@@ -417,8 +467,13 @@ impl EPS {
         let rx_len = 78;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"OverCurrent Status Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"OverCurrent Status Response {:?}", x};
                 match match_stat(x[4]){
                     Ok(()) => Ok(bincode::deserialize::<OverCurrentFaultState>(&x[6..50])?),
                     Err(e) => Err(e),
@@ -441,8 +496,13 @@ impl EPS {
         let rx_len = 8;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"ABF State {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"ABF State Cmd {:?}", x};
                 match match_stat(x[4]){
                     Ok(()) => Ok(bincode::deserialize::<ABFState>(&x[6..8])?),
                     Err(e) => Err(e),
@@ -546,9 +606,15 @@ impl EPS {
         let rx_len = 274;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"PIU HK Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"PIU HK Response {:?}", x};
                 match match_stat(x[4]){
+                    // One reseved byte. Starting from the 6th byte
                     Ok(()) => Ok(bincode::deserialize::<PIUHk>(&x[6..184])?),
                     Err(e) => Err(e),
                 }                 
@@ -593,8 +659,13 @@ impl EPS {
         let rx_len = 8 + param_size;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
                 match match_stat(x[4]){
                     Ok(()) => Ok(x[6..].to_vec()),
                     Err(e) => Err(e),
@@ -622,8 +693,15 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"Reset All Config Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Reset All Config Response {:?}", x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
@@ -642,8 +720,15 @@ impl EPS {
         let rx_len = 1;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"Correct Time Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Correct Time Response {:?}", x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
 
@@ -663,8 +748,15 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
+        #[cfg(feature = "debug")]
+        println!{"Reset All Counters Cmd {:?}",command};
+
         match self.i2c.transfer(command, rx_len, delay) {
-            Ok(x) => match_stat(x[4]),
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"Reset All Counters Response {:?}", x};
+                match_stat(x[4])
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
