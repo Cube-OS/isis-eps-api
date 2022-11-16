@@ -446,7 +446,8 @@ impl EPS {
                 #[cfg(feature = "debug")]
                 println!{"System Status Response {:?}", x};
                 match match_stat(x[4]){
-                    Ok(()) => Ok(bincode::deserialize::<SystemStatus>(&x[5..])?),
+                    // Ok(()) => Ok(bincode::deserialize::<SystemStatus>(&x[5..])?),
+                    Ok(()) => Ok(SystemStatus::from(x)),
                     Err(e) => Err(e),
                 }                 
             }
@@ -475,7 +476,8 @@ impl EPS {
                 #[cfg(feature = "debug")]
                 println!{"OverCurrent Status Response {:?}", x};
                 match match_stat(x[4]){
-                    Ok(()) => Ok(bincode::deserialize::<OverCurrentFaultState>(&x[6..50])?),
+                    Ok(()) => Ok(OverCurrentFaultState::from(x[0..50].try_into())),
+                    // Ok(()) => Ok(bincode::deserialize::<OverCurrentFaultState>(&x[6..50])?),
                     Err(e) => Err(e),
                 }                 
             }
@@ -504,7 +506,8 @@ impl EPS {
                 #[cfg(feature = "debug")]
                 println!{"ABF State Cmd {:?}", x};
                 match match_stat(x[4]){
-                    Ok(()) => Ok(bincode::deserialize::<ABFState>(&x[6..8])?),
+                    Ok(()) => Ok(ABFState::from(x)),
+                    // Ok(()) => Ok(bincode::deserialize::<ABFState>(&x[6..8])?),
                     Err(e) => Err(e),
                 }                 
             }
@@ -614,8 +617,9 @@ impl EPS {
                 #[cfg(feature = "debug")]
                 println!{"PIU HK Response {:?}", x};
                 match match_stat(x[4]){
+                    Ok(()) => Ok(PIUHk::from(x[0..184].try_into().expect("slice with incorrect length"))),
                     // One reseved byte. Starting from the 6th byte
-                    Ok(()) => Ok(bincode::deserialize::<PIUHk>(&x[6..184])?),
+                    // Ok(()) => Ok(bincode::deserialize::<PIUHk>(&x[6..184])?),
                     Err(e) => Err(e),
                 }                 
             }

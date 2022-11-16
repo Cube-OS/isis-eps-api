@@ -140,6 +140,16 @@ pub struct VIPRawData {
     pwr_raw: i16,
 }
 
+// impl From<Vec<u8>> for VIPRawData {
+//     fn from(v: Vec<u8>) -> VIPRawData {
+//         VIPRawData{
+//             volt_raw: <i16>::from_le_bytes([v[0],v[1]]),
+//             curr_raw: <i16>::from_le_bytes([v[2],v[3]]),
+//             pwr_raw: <i16>::from_le_bytes([v[4],v[5]]),
+//         }
+//     }
+// }
+
 // The voltage V - current I - power P datatype (VIPD) data. 
 // Used in blocks across the HK telemetry.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
@@ -149,6 +159,15 @@ pub struct VIPData {
     pwr: i16,
 }
 
+impl From<Vec<u8>> for VIPData {
+    fn from(v: Vec<u8>) -> VIPData {
+        VIPData{
+            volt: <i16>::from_le_bytes([v[0],v[1]]),
+            curr: <i16>::from_le_bytes([v[2],v[3]]),
+            pwr: <i16>::from_le_bytes([v[4],v[5]]),
+        }
+    }
+}
 // The battery pack raw data (BPD). 
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
@@ -179,10 +198,26 @@ pub struct BattPackData{
     bat_temp3: i16,
 }
 
+impl From<Vec<u8>> for BattPackData {
+    fn from(v: Vec<u8>) -> BattPackData {
+        BattPackData{
+            vip_bp_output: VIPData::from(v[0..6].to_vec()),
+            stat_bp: <u16>::from_le_bytes([v[6],v[7]]),
+            volt_cell1: <i16>::from_le_bytes([v[8],v[9]]),
+            volt_cell2: <i16>::from_le_bytes([v[10],v[11]]),
+            volt_cell3: <i16>::from_le_bytes([v[12],v[13]]),
+            volt_cell4: <i16>::from_le_bytes([v[14],v[15]]),
+            bat_temp1: <i16>::from_le_bytes([v[16],v[17]]),
+            bat_temp2: <i16>::from_le_bytes([v[18],v[19]]),
+            bat_temp3: <i16>::from_le_bytes([v[20],v[21]]),
+        }
+    }
+}
+
 //CCD Raw data, the conditioning channel datatype (CCD) for each power conditioning chain  
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct CondChnRawData {
-    vip_cc_output_raw: BattPackRawData,
+    vip_cc_output_raw: VIPData,
     volt_in_mppt_raw: u16,
     curr_in_mppt_raw: u16,
     volt_out_mppt_raw: u16,
@@ -192,11 +227,23 @@ pub struct CondChnRawData {
 //CCD data, the conditioning channel datatype for each power conditioning chain  
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct CondChnData {
-    vip_cc_output: BattPackData,
+    vip_cc_output: VIPData,
     volt_in_mppt: i16,
     curr_in_mppt: i16,
     volt_out_mppt: i16,
     curr_out_mppt: i16,
+}
+
+impl From<Vec<u8>> for CondChnData {
+    fn from(v: Vec<u8>) -> CondChnData {
+        CondChnData{
+            vip_cc_output: VIPData::from(v[0..6].to_vec()),
+            volt_in_mppt: <i16>::from_le_bytes([v[6],v[7]]),
+            curr_in_mppt: <i16>::from_le_bytes([v[8],v[9]]),
+            volt_out_mppt: <i16>::from_le_bytes([v[10],v[11]]),
+            curr_out_mppt: <i16>::from_le_bytes([v[12],v[13]]),
+        }
+    }
 }
 
 //CCSD raw, Short for conditioning channel datatype (CCD), withou VIP data
@@ -215,6 +262,17 @@ pub struct CondChnShortData {
     curr_in_mppt: i16,
     volt_out_mppt: i16,
     curr_out_mppt: i16,
+}
+
+impl From<Vec<u8>> for CondChnShortData {
+    fn from(v: Vec<u8>) -> CondChnShortData {
+        CondChnShortData{
+            volt_in_mppt: <i16>::from_le_bytes([v[0],v[1]]),
+            curr_in_mppt: <i16>::from_le_bytes([v[2],v[3]]),
+            volt_out_mppt: <i16>::from_le_bytes([v[4],v[5]]),
+            curr_out_mppt: <i16>::from_le_bytes([v[6],v[7]]),
+        }
+    }
 }
 
 /* ----------------------------------------------------------------
@@ -263,6 +321,32 @@ pub struct SystemStatus {
     unix_second: u8,
 }
 
+impl From<Vec<u8>> for SystemStatus {
+    fn from(v: Vec<u8>) -> SystemStatus {
+        SystemStatus{
+            mode: v[5],
+            conf: v[6],
+            reset_cause: v[7],
+            uptime: <u32>::from_le_bytes([v[8],v[9],v[10],v[11]]),
+            error: <u16>::from_le_bytes([v[12],v[13]]),
+            rc_cnt_pwron: <u16>::from_le_bytes([v[14],v[15]]),
+            rc_cnt_wdg: <u16>::from_le_bytes([v[16],v[17]]),
+            rc_cnt_cmd: <u16>::from_le_bytes([v[18],v[19]]),
+            rc_cnt_mcu: <u16>::from_le_bytes([v[20],v[21]]),
+            rc_cnt_lowpwr: <u16>::from_le_bytes([v[22],v[23]]),
+            prevcmd_elapsed: <u16>::from_le_bytes([v[24],v[25]]),
+            unix_time: <u32>::from_le_bytes([v[26],v[27],v[28],v[29]]),
+            unix_year: v[30],
+            unix_month: v[31],
+            unix_day: v[32], 
+            unix_hour: v[33],
+            unix_minute: v[34],
+            unix_second: v[35],
+        }
+    }
+}
+
+
 
 // Overcurrent Fault State （0x42）
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
@@ -271,8 +355,12 @@ pub struct OverCurrentFaultState {
     // Length of useful data for ICEPSv2 (17 channels), 50bytes
     // Bitflag field indicating channel-on status. 1 means corresponding output bus is enabled
     stat_ch_on: u16,
-    // Bitflag field indicating overcurrent fault status
+    // Bitflag field indicating channel-on fault status
     stat_ch_ext_on: u16,
+    // Bitflag field indicating overcurrent status. 1 means corresponding output bus is latched off
+    stat_ch_ocf: u16,
+    // Bitflag field indicating overcurrent fault status 
+    stat_ch_ext_ocf: u16,
     // VD0_0, 3.3V
     ocf_cnt_ch00: u16,
     // VD1_0, 5V
@@ -309,6 +397,33 @@ pub struct OverCurrentFaultState {
     ocf_cnt_ch16: u16,
 }
 
+impl From<Vec<u8>> for OverCurrentFaultState {
+    fn from(v: Vec<u8>) -> OverCurrentFaultState {
+        OverCurrentFaultState{
+            stat_ch_on: <u16>::from_le_bytes([v[6],v[7]]),
+            stat_ch_ext_on: <u16>::from_le_bytes([v[8],v[9]]),
+            stat_ch_ocf: <u16>::from_le_bytes([v[10],v[11]]),
+            stat_ch_ext_ocf: <u16>::from_le_bytes([v[12],v[13]]),
+            ocf_cnt_ch00: <u16>::from_le_bytes([v[14],v[15]]),
+            ocf_cnt_ch01: <u16>::from_le_bytes([v[16],v[17]]),
+            ocf_cnt_ch02: <u16>::from_le_bytes([v[18],v[19]]),
+            ocf_cnt_ch03: <u16>::from_le_bytes([v[20],v[21]]),
+            ocf_cnt_ch04: <u16>::from_le_bytes([v[22],v[23]]),
+            ocf_cnt_ch05: <u16>::from_le_bytes([v[24],v[25]]),
+            ocf_cnt_ch06: <u16>::from_le_bytes([v[26],v[27]]),
+            ocf_cnt_ch07: <u16>::from_le_bytes([v[28],v[29]]),
+            ocf_cnt_ch08: <u16>::from_le_bytes([v[30],v[31]]),
+            ocf_cnt_ch09: <u16>::from_le_bytes([v[32],v[33]]),
+            ocf_cnt_ch10: <u16>::from_le_bytes([v[34],v[35]]),
+            ocf_cnt_ch11: <u16>::from_le_bytes([v[36],v[37]]),
+            ocf_cnt_ch12: <u16>::from_le_bytes([v[38],v[39]]),
+            ocf_cnt_ch13: <u16>::from_le_bytes([v[40],v[41]]),
+            ocf_cnt_ch14: <u16>::from_le_bytes([v[42],v[43]]),
+            ocf_cnt_ch15: <u16>::from_le_bytes([v[44],v[45]]),
+            ocf_cnt_ch16: <u16>::from_le_bytes([v[46],v[47]]),
+        }
+    }
+}
 // PBU ABF Placed State (0x44)
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct ABFState {
@@ -317,6 +432,15 @@ pub struct ABFState {
     pub abf_placed_0: u8,
     // 0xAB = ABF is placed, 0x00 = ABF is not placed
     pub abf_placed_1: u8,
+}
+
+impl From<Vec<u8>> for ABFState {
+    fn from(v: Vec<u8>) -> ABFState {
+        ABFState{
+            abf_placed_0: v[6],
+            abf_placed_1: v[7],
+        }
+    }
 }
 
 // PDU Housekeeping Engineering/Average Data (0x52 and 0x54)
@@ -489,4 +613,47 @@ pub struct PIUHk {
     // VD5_0, 28.2V (default)
     vip_cnt_ch16: VIPData,
     // Stop at 184 byte for the ICEPSv2
+}
+
+impl From<Vec<u8>> for PIUHk {
+    fn from(v: Vec<u8>) -> PIUHk {
+        PIUHk{
+            volt_brdsup: <i16>::from_le_bytes([v[6],v[7]]),
+            temp: <i16>::from_le_bytes([v[8],v[9]]),
+            vip_dist_input: VIPData::from(v[10..16].to_vec()),
+            vip_batt_input: VIPData::from(v[16..22].to_vec()),
+            stat_ch_on: <u16>::from_le_bytes([v[22],v[23]]), 
+            stat_ch_ocf: <u16>::from_le_bytes([v[24],v[25]]),
+            batt_stat: <u16>::from_le_bytes([v[26],v[27]]),
+            batt_temp2:<i16>::from_le_bytes([v[28],v[29]]),
+            batt_temp3:<i16>::from_le_bytes([v[30],v[31]]),
+            volt_vd0:<i16>::from_le_bytes([v[32],v[33]]),
+            volt_vd1:<i16>::from_le_bytes([v[34],v[35]]),
+            volt_vd2:<i16>::from_le_bytes([v[36],v[37]]),
+            vip_cnt_ch00: VIPData::from(v[38..44].to_vec()),
+            vip_cnt_ch01: VIPData::from(v[44..50].to_vec()),
+            vip_cnt_ch02: VIPData::from(v[50..56].to_vec()),
+            vip_cnt_ch03: VIPData::from(v[56..62].to_vec()),
+            vip_cnt_ch04: VIPData::from(v[62..68].to_vec()),
+            vip_cnt_ch05: VIPData::from(v[68..74].to_vec()),
+            vip_cnt_ch06: VIPData::from(v[74..80].to_vec()),
+            vip_cnt_ch07: VIPData::from(v[80..86].to_vec()),
+            vip_cnt_ch08: VIPData::from(v[86..92].to_vec()),
+            ccd1: CondChnShortData::from(v[92..100].to_vec()),
+            ccd2: CondChnShortData::from(v[100..108].to_vec()),
+            ccd3: CondChnShortData::from(v[108..116].to_vec()),
+            vip_cnt_ch09: VIPData::from(v[116..122].to_vec()),
+            vip_cnt_ch10: VIPData::from(v[122..128].to_vec()),
+            vip_cnt_ch11: VIPData::from(v[128..134].to_vec()),
+            vip_cnt_ch12: VIPData::from(v[134..140].to_vec()),
+            vip_cnt_ch13: VIPData::from(v[140..146].to_vec()),
+            vip_cnt_ch14: VIPData::from(v[146..152].to_vec()),
+            vip_cnt_ch15: VIPData::from(v[152..158].to_vec()),
+            ccd4: CondChnShortData::from(v[158..166].to_vec()),
+            ccd5: CondChnShortData::from(v[166..174].to_vec()),
+            stat_ch_ext_on: <u16>::from_le_bytes([v[174],v[175]]),
+            stat_ch_ext_ocf: <u16>::from_le_bytes([v[176],v[177]]),
+            vip_cnt_ch16: VIPData::from(v[178..184].to_vec()),
+        }
+    }
 }
