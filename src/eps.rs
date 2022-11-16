@@ -476,7 +476,7 @@ impl EPS {
                 #[cfg(feature = "debug")]
                 println!{"OverCurrent Status Response {:?}", x};
                 match match_stat(x[4]){
-                    Ok(()) => Ok(OverCurrentFaultState::from(x[0..50].try_into())),
+                    Ok(()) => Ok(OverCurrentFaultState::from(x)),
                     // Ok(()) => Ok(bincode::deserialize::<OverCurrentFaultState>(&x[6..50])?),
                     Err(e) => Err(e),
                 }                 
@@ -617,7 +617,7 @@ impl EPS {
                 #[cfg(feature = "debug")]
                 println!{"PIU HK Response {:?}", x};
                 match match_stat(x[4]){
-                    Ok(()) => Ok(PIUHk::from(x[0..184].try_into().expect("slice with incorrect length"))),
+                    Ok(()) => Ok(PIUHk::from(x)),
                     // One reseved byte. Starting from the 6th byte
                     // Ok(()) => Ok(bincode::deserialize::<PIUHk>(&x[6..184])?),
                     Err(e) => Err(e),
