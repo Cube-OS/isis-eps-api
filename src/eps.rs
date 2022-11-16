@@ -230,12 +230,12 @@ impl EPS {
         let rx_len = 5;
         let delay = Duration::from_millis(50);
        
-        #[cfg(feature = "debug")]
+        // #[cfg(feature = "debug")]
         println!{"Eps Ping Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
-                #[cfg(feature = "debug")]
+                // #[cfg(feature = "debug")]
                 println!{"Eps Ping Response{:?}",x};
                 match_stat(x[4])
             }
