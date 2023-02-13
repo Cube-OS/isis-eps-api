@@ -28,11 +28,10 @@ use rust_udp::{Connection as Udp};
 use std::time::Duration;
 use crate::objects::*;
 use failure::Fail;
-use serde::*;
+// use serde::*;
 // use std::cell::RefCell;
 // use std::thread;
 // use serial::*;
-use juniper::*;
 use std::convert::From;
 use cubeos_error::Error;
 
@@ -105,6 +104,8 @@ pub enum EpsError {
     /// I2C Error
     #[fail(display = "I2C Error")]
     I2CError(std::io::ErrorKind),
+    #[fail(display = "I2C Error")]
+    I2CError2(u8),
     /// I2C Set Error
     #[fail(display = "I2C Set Error")]
     I2CSet,
@@ -138,6 +139,7 @@ impl From<EpsError> for Error {
         match e {
             EpsError::Err => cubeos_error::Error::ServiceError(0),
             EpsError::I2CError(io) => cubeos_error::Error::from(io),
+            EpsError::I2CError2(io) => cubeos_error::Error::Io(io),
             EpsError::I2CSet => cubeos_error::Error::ServiceError(1),
             EpsError::TransferError => cubeos_error::Error::ServiceError(2),
             EpsError::InvalidInput => cubeos_error::Error::ServiceError(3),
@@ -150,6 +152,27 @@ impl From<EpsError> for Error {
             EpsError::InvalidSystemType => cubeos_error::Error::ServiceError(9),
             EpsError::InternalProcessing => cubeos_error::Error::ServiceError(10),
             // _ => cubeos_error::Error::ServiceError(0),
+        }
+    }
+}
+
+impl From<cubeos_error::Error> for EpsError {
+    fn from(e: cubeos_error::Error) -> EpsError {
+        match e {
+            cubeos_error::Error::ServiceError(0) => EpsError::Err,
+            cubeos_error::Error::Io(io) => EpsError::I2CError2(io),
+            cubeos_error::Error::ServiceError(1) => EpsError::I2CSet,
+            cubeos_error::Error::ServiceError(2) => EpsError::TransferError,
+            cubeos_error::Error::ServiceError(3) => EpsError::InvalidInput,
+            cubeos_error::Error::Bincode(io) => EpsError::Bincode(io),
+            cubeos_error::Error::ServiceError(4) => EpsError::Rejected,
+            cubeos_error::Error::ServiceError(5) => EpsError::InvalidCommandCode,
+            cubeos_error::Error::ServiceError(6) => EpsError::ParameterMissing,
+            cubeos_error::Error::ServiceError(7) => EpsError::Parameterinvalid,
+            cubeos_error::Error::ServiceError(8) => EpsError::UnavailableMode,
+            cubeos_error::Error::ServiceError(9) => EpsError::InvalidSystemType,
+            cubeos_error::Error::ServiceError(10) => EpsError::InternalProcessing,
+            _ => EpsError::Err,
         }
     }
 }

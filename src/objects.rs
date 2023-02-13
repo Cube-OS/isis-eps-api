@@ -25,9 +25,10 @@
 // System Type Identifier (STID)
 
 use serde::*;
-use juniper::*;
+use strum_macros::{EnumString,Display,EnumIter};
+use strum::IntoEnumIterator;
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum StID {
     // Power Distribution Unit System Type Identifier
     PduStid,
@@ -42,7 +43,7 @@ pub enum StID {
 }
 
 // Output Bus Group 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum BusGroup {
     BusGroupOn,
     BusGroupOff,
@@ -50,21 +51,21 @@ pub enum BusGroup {
 }
 
 // Output Bus Channel
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum BusChannel {
     ChannelOn,
     ChannelOff,
 }
 
 // Used in ModeSwitch (0x30/0x31)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum ModeSwitch {
     Nominal,
     Safety,
 }
 
 // Reset status, used in get system status (0x40)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum EpsMode {
     Startup,
     Nominal,
@@ -73,14 +74,14 @@ pub enum EpsMode {
 }
 
 // Reset status, used in get system status (0x40)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum ConfStatus {
     NotAltered,
     Altered,
 }
 
 // Reset status, used in get system status (0x40)
-// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 // pub enum ResetCause {
 //     PowerOn,
 //     Watchdog,
@@ -89,42 +90,42 @@ pub enum ConfStatus {
 //     EmergLowPwr,
 // }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PDUHkSel {
     // PDURawHK,
     PDUEngHK,
     PDUAvgHK,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PBUHkSel {
     // PBURawHK,
     PBUEngHK,
     PBUAvgHK,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PCUHkSel {
     // PCURawHK,
     PCUEngHK,
     PCUAvgHK,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PIUHkSel {
     // PIURawHK,
     PIUEngHK,
     PIUAvgHK, 
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum SysConfig1 {
     GetConfigParam, 
     SetConfigParam, 
     ResetConfigParam,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, GraphQLEnum)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum SysConfig2 {
     ResetAll, 
     LoadConfig, 
@@ -380,7 +381,7 @@ pub struct OverCurrentFaultState {
     // VD2_3, 3.3V
     ocf_cnt_ch08: u16,
     // VD0_1, 3.3V 
-    ocf_cnt_ch09: u16,
+    ocf_cnt_ch09: u16, //CubeADCS 3-Axi
     // VD0_2, 3.3V    
     ocf_cnt_ch10: u16,
     // VD0_3, 3.3V    
