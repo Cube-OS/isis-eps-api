@@ -165,7 +165,7 @@ impl From<Vec<u8>> for VIPData {
         VIPData{
             volt: <i16>::from_le_bytes([v[0],v[1]]),
             curr: <i16>::from_le_bytes([v[2],v[3]]),
-            pwr: <i16>::from_le_bytes([v[4],v[5]]),
+            pwr: <i16>::from_le_bytes([v[4],v[5]])*10,
         }
     }
 }
@@ -184,12 +184,51 @@ pub struct BattPackRawData{
     bat_temp3_raw: u16,
 }
 
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
+pub struct BattPackStatus {
+    batt1_under: bool,
+    batt2_under: bool,
+    batt3_under: bool,
+    batt4_under: bool,
+    batt1_over: bool,
+    batt2_over: bool,
+    batt3_over: bool,
+    batt4_over: bool,
+    batt1_balancing: bool,
+    batt2_balancing: bool,
+    batt3_balancing: bool,
+    batt4_balancing: bool,
+    heater: bool,
+    enabled: bool, 
+}
+impl From<Vec<u8>> for BattPackStatus {
+    fn from(v: Vec<u8>) -> BattPackStatus {
+        let b = <u16>::from_le_bytes(v);
+        BattPackStatus {
+            batt1_under: b & 0x0001,
+            batt2_under: b & 0x0002,
+            batt3_under: b & 0x0004,
+            batt4_under: b & 0x0008,
+            batt1_over: b & 0x0010,
+            batt2_over: b & 0x0020,
+            batt3_over: b & 0x0040,
+            batt4_over: b & 0x0080,
+            batt1_balancing: b & 0x0100,
+            batt2_balancing: b & 0x0200,
+            batt3_balancing: b & 0x0400,
+            batt4_balancing: b & 0x0800,
+            heater: b & 0x1000,
+            enabled: b & 0x8000,
+        }
+    }
+}
+
 // The battery pack data (BPD). 
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct BattPackData{
     vip_bp_output: VIPData,
-    stat_bp: u16,
+    stat_bp: BattPackStatus,
     volt_cell1: i16,
     volt_cell2: i16,
     volt_cell3: i16,
@@ -203,7 +242,7 @@ impl From<Vec<u8>> for BattPackData {
     fn from(v: Vec<u8>) -> BattPackData {
         BattPackData{
             vip_bp_output: VIPData::from(v[0..6].to_vec()),
-            stat_bp: <u16>::from_le_bytes([v[6],v[7]]),
+            stat_bp: BattPackStatus::from([v[6],v[7]]),
             volt_cell1: <i16>::from_le_bytes([v[8],v[9]]),
             volt_cell2: <i16>::from_le_bytes([v[10],v[11]]),
             volt_cell3: <i16>::from_le_bytes([v[12],v[13]]),

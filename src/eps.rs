@@ -651,6 +651,181 @@ impl EPS {
 
     } 
 
+
+    pub fn get_ch_startup_ena_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x6002.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+
+        let rx_len = 12;
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+
+    pub fn get_ch_startup_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x6003.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+
+        let rx_len = 12;
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_ch_latchoff_ena_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x6004.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+
+        let rx_len = 12;
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_ch_latchoff_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x6005.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+
+        let rx_len = 12;
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_ttc_wdg_timeout(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x4000.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+
+        let rx_len = 10;
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_ttc_wdg_timeout_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x4001.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+
+        let rx_len = 10;
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+
+
+
     // 0x82/0x84/0x86 Get/Set/Reset Configuration commands 
     // XL: Not sure how to handle the return
     pub fn system_config_command(&self, typ_stid: StID, mode: SysConfig1, para_id: u16) -> EpsResult<Vec<u8>> {
@@ -666,19 +841,17 @@ impl EPS {
         let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, para_id_bytes[0], para_id_bytes[1]].to_vec();
 
         let command = Command{cmd, data};
-        let param_size;
-
-        match para_id_bytes[1] {
-            0x10 => param_size = 1, 
-            0x20 => param_size = 1,  
-            0x30 => param_size = 2, 
-            0x40 => param_size = 2, 
-            0x50 => param_size = 4, 
-            0x60 => param_size = 4, 
-            0x70 => param_size = 4, 
-            0x80 => param_size = 8, 
-            0x90 => param_size = 8, 
-            0xA0 => param_size = 8, 
+        let param_size = match para_id_bytes[1] {
+            0x10 => 1, 
+            0x20 => 1,  
+            0x30 => 2, 
+            0x40 => 2, 
+            0x50 => 4, 
+            0x60 => 4, 
+            0x70 => 4, 
+            0x80 => 8, 
+            0x90 => 8, 
+            0xA0 => 8, 
             _=> return Err(EpsError::InvalidInput),
         } 
 
