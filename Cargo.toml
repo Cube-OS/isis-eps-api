@@ -9,7 +9,7 @@ edition = "2021"
 serde = "1.0"
 bincode = "1.0"
 failure = "0.1.2"
-cubeos-error = { git = "ssh://git@github.com/Cube-OS/cubeos-error.git"}
+cubeos-error = { git = "ssh://git@github.com/Cube-OS/cubeos-service.git", features=["api"]}
 i2c-rs = { git = "ssh://git@github.com/Cube-OS/i2c-rs.git" }
 strum = "0.24"
 strum_macros = "0.24"
