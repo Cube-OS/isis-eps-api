@@ -165,10 +165,11 @@ impl From<Vec<u8>> for VIPData {
         VIPData{
             volt: <i16>::from_le_bytes([v[0],v[1]]),
             curr: <i16>::from_le_bytes([v[2],v[3]]),
-            pwr: <i16>::from_le_bytes([v[4],v[5]])*10,
+            pwr: 10*(<i16>::from_le_bytes([v[4],v[5]])),
         }
     }
 }
+
 // The battery pack raw data (BPD). 
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
@@ -203,32 +204,47 @@ pub struct BattPackStatus {
 }
 impl From<Vec<u8>> for BattPackStatus {
     fn from(v: Vec<u8>) -> BattPackStatus {
-        let b = <u16>::from_le_bytes(v);
+        let b = <u16>::from_le_bytes([v[0],v[1]]);
         BattPackStatus {
-            batt1_under: b & 0x0001,
-            batt2_under: b & 0x0002,
-            batt3_under: b & 0x0004,
-            batt4_under: b & 0x0008,
-            batt1_over: b & 0x0010,
-            batt2_over: b & 0x0020,
-            batt3_over: b & 0x0040,
-            batt4_over: b & 0x0080,
-            batt1_balancing: b & 0x0100,
-            batt2_balancing: b & 0x0200,
-            batt3_balancing: b & 0x0400,
-            batt4_balancing: b & 0x0800,
-            heater: b & 0x1000,
-            enabled: b & 0x8000,
+            batt1_under: (b & 0x0001)!=0,
+            batt2_under: (b & 0x0002)!=0,
+            batt3_under: (b & 0x0004)!=0,
+            batt4_under: (b & 0x0008)!=0,
+            batt1_over: (b & 0x0010)!=0,
+            batt2_over: (b & 0x0020)!=0,
+            batt3_over: (b & 0x0040)!=0,
+            batt4_over: (b & 0x0080)!=0,
+            batt1_balancing: (b & 0x0100)!=0,
+            batt2_balancing: (b & 0x0200)!=0,
+            batt3_balancing: (b & 0x0400)!=0,
+            batt4_balancing: (b & 0x0800)!=0,
+            heater: (b & 0x1000)!=0,
+            enabled: (b & 0x8000)!=0,
         }
     }
 }
+
+// pub struct BITFLAG{
+//     STAT_BU = u16
+//     STAT_CH_ON = u16
+//     STAT_CH_OCF = u16
+//     BAT_STAT = u16
+//     STAT_CH_EXT_ON = u16
+//     STAT_CH_EXT_OCF = u16
+//     CH_LATCHOFF_ENA_BF = u32
+//     CH_FORCE_ENA_USE_BF = u32
+//     CH_STARTUP_ENA_USE_BF = u32
+//     CH_LATCHOFF_ENA_USE_BF = u32
+//     SWCI_CH_CMD_ENA_BF = u32
+//     SWCI_CH_CMD_DISA_BF = u32
+//     }
 
 // The battery pack data (BPD). 
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct BattPackData{
     vip_bp_output: VIPData,
-    stat_bp: BattPackStatus,
+    stat_bp: i16,
     volt_cell1: i16,
     volt_cell2: i16,
     volt_cell3: i16,
@@ -242,7 +258,7 @@ impl From<Vec<u8>> for BattPackData {
     fn from(v: Vec<u8>) -> BattPackData {
         BattPackData{
             vip_bp_output: VIPData::from(v[0..6].to_vec()),
-            stat_bp: BattPackStatus::from([v[6],v[7]]),
+            stat_bp: <i16>::from_le_bytes([v[6],v[7]]),
             volt_cell1: <i16>::from_le_bytes([v[8],v[9]]),
             volt_cell2: <i16>::from_le_bytes([v[10],v[11]]),
             volt_cell3: <i16>::from_le_bytes([v[12],v[13]]),
@@ -561,6 +577,19 @@ pub struct PBUHk {
     pub bp1: BattPackData,
     pub bp2: BattPackData,
     pub bp3: BattPackData,
+}
+impl From<Vec<u8>> for PBUHk {
+    fn from(v: Vec<u8>) -> PBUHk {
+        PBUHk {
+            volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
+            temp: <i16>::from_le_bytes([v[2],v[3]]),
+            vip_input: VIPData::from(v[4..10].to_vec()),
+            stat_bu: <u16>::from_le_bytes([v[10],v[11]]),
+            bp1: BattPackData::from(v[12..34].to_vec()),
+            bp2: BattPackData::from(v[34..56].to_vec()),
+            bp3: BattPackData::from(v[56..78].to_vec()),
+        }
+    }
 }
 
 // PCU Housekeeping Engineering/Average Data (0x72 and 0x74)

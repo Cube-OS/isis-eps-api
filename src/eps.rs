@@ -23,17 +23,14 @@
 
 // Dependancies
 use rust_i2c::{Command, Connection as I2c};
-use rust_udp::{Connection as Udp};
+// use rust_udp::{Connection as Udp};
 
-use std::time::Duration;
+use std::{time::Duration, intrinsics::size_of, mem::size_of};
 use crate::objects::*;
 use failure::Fail;
-// use serde::*;
-// use std::cell::RefCell;
-// use std::thread;
-// use serial::*;
 use std::convert::From;
-use cubeos_error::Error;
+use cubeos_service::Error;
+use std::mem::*;
 
 // ID's
 const PDU_STID: u8 = 0x11;
@@ -133,45 +130,45 @@ pub enum EpsError {
     InternalProcessing,
 }
 
-/// All Errors in EpsError are converted to cubeos_error::Error::ServiceError(u8)
+/// All Errors in EpsError are converted to Error::ServiceError(u8)
 impl From<EpsError> for Error {
-    fn from(e: EpsError) -> cubeos_error::Error {
+    fn from(e: EpsError) -> Error {
         match e {
-            EpsError::Err => cubeos_error::Error::ServiceError(0),
-            EpsError::I2CError(io) => cubeos_error::Error::from(io),
-            EpsError::I2CError2(io) => cubeos_error::Error::Io(io),
-            EpsError::I2CSet => cubeos_error::Error::ServiceError(1),
-            EpsError::TransferError => cubeos_error::Error::ServiceError(2),
-            EpsError::InvalidInput => cubeos_error::Error::ServiceError(3),
-            EpsError::Bincode(io) => cubeos_error::Error::Bincode(io),
-            EpsError::Rejected => cubeos_error::Error::ServiceError(4),
-            EpsError::InvalidCommandCode => cubeos_error::Error::ServiceError(5),
-            EpsError::ParameterMissing => cubeos_error::Error::ServiceError(6),
-            EpsError::Parameterinvalid => cubeos_error::Error::ServiceError(7),
-            EpsError::UnavailableMode => cubeos_error::Error::ServiceError(8),
-            EpsError::InvalidSystemType => cubeos_error::Error::ServiceError(9),
-            EpsError::InternalProcessing => cubeos_error::Error::ServiceError(10),
-            // _ => cubeos_error::Error::ServiceError(0),
+            EpsError::Err => Error::ServiceError(0),
+            EpsError::I2CError(io) => Error::from(io),
+            EpsError::I2CError2(io) => Error::Io(io),
+            EpsError::I2CSet => Error::ServiceError(1),
+            EpsError::TransferError => Error::ServiceError(2),
+            EpsError::InvalidInput => Error::ServiceError(3),
+            EpsError::Bincode(io) => Error::Bincode(io),
+            EpsError::Rejected => Error::ServiceError(4),
+            EpsError::InvalidCommandCode => Error::ServiceError(5),
+            EpsError::ParameterMissing => Error::ServiceError(6),
+            EpsError::Parameterinvalid => Error::ServiceError(7),
+            EpsError::UnavailableMode => Error::ServiceError(8),
+            EpsError::InvalidSystemType => Error::ServiceError(9),
+            EpsError::InternalProcessing => Error::ServiceError(10),
+            // _ => Error::ServiceError(0),
         }
     }
 }
 
-impl From<cubeos_error::Error> for EpsError {
-    fn from(e: cubeos_error::Error) -> EpsError {
+impl From<Error> for EpsError {
+    fn from(e: Error) -> EpsError {
         match e {
-            cubeos_error::Error::ServiceError(0) => EpsError::Err,
-            cubeos_error::Error::Io(io) => EpsError::I2CError2(io),
-            cubeos_error::Error::ServiceError(1) => EpsError::I2CSet,
-            cubeos_error::Error::ServiceError(2) => EpsError::TransferError,
-            cubeos_error::Error::ServiceError(3) => EpsError::InvalidInput,
-            cubeos_error::Error::Bincode(io) => EpsError::Bincode(io),
-            cubeos_error::Error::ServiceError(4) => EpsError::Rejected,
-            cubeos_error::Error::ServiceError(5) => EpsError::InvalidCommandCode,
-            cubeos_error::Error::ServiceError(6) => EpsError::ParameterMissing,
-            cubeos_error::Error::ServiceError(7) => EpsError::Parameterinvalid,
-            cubeos_error::Error::ServiceError(8) => EpsError::UnavailableMode,
-            cubeos_error::Error::ServiceError(9) => EpsError::InvalidSystemType,
-            cubeos_error::Error::ServiceError(10) => EpsError::InternalProcessing,
+            Error::ServiceError(0) => EpsError::Err,
+            Error::Io(io) => EpsError::I2CError2(io),
+            Error::ServiceError(1) => EpsError::I2CSet,
+            Error::ServiceError(2) => EpsError::TransferError,
+            Error::ServiceError(3) => EpsError::InvalidInput,
+            Error::Bincode(io) => EpsError::Bincode(io),
+            Error::ServiceError(4) => EpsError::Rejected,
+            Error::ServiceError(5) => EpsError::InvalidCommandCode,
+            Error::ServiceError(6) => EpsError::ParameterMissing,
+            Error::ServiceError(7) => EpsError::Parameterinvalid,
+            Error::ServiceError(8) => EpsError::UnavailableMode,
+            Error::ServiceError(9) => EpsError::InvalidSystemType,
+            Error::ServiceError(10) => EpsError::InternalProcessing,
             _ => EpsError::Err,
         }
     }
@@ -229,15 +226,13 @@ pub type EpsResult<T> = Result<T, EpsError>;
 
 pub struct EPS {
     i2c: I2c,
-    udp_connection: Udp,
 }
 
 impl EPS {
     // Basic function to initialise an instance of the EpsStruct 
-    pub fn new(i2c_path: String, i2c_addr: u16, udp_path: String, udp_to: String) -> EpsResult<Self> {
+    pub fn new(i2c_path: String, i2c_addr: u16) -> EpsResult<Self> {
         Ok(Self{
             i2c: I2c::from_path(&i2c_path,i2c_addr),
-            udp_connection: Udp::from_path(udp_path, udp_to),
         })
     }
 
@@ -582,7 +577,7 @@ impl EPS {
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 match match_stat(x[4]){
-                    Ok(()) => Ok(bincode::deserialize::<PBUHk>(&x[6..])?),
+                    Ok(()) => Ok(PBUHk::from(x[6..].to_vec())),
                     Err(e) => Err(e),
                 }                 
             }
@@ -655,12 +650,12 @@ impl EPS {
     pub fn get_ch_startup_ena_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
-        let id = 0x6002.to_le_bytes();
+        let id = 0x6002_u16.to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
         let command = Command{cmd,data};
-
-        let rx_len = 12;
+        // rx_len = 8 + size in bytes
+        let rx_len = 8+size_of::<u32>();
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
@@ -685,7 +680,7 @@ impl EPS {
     pub fn get_ch_startup_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
-        let id = 0x6003.to_le_bytes();
+        let id = 0x6003_u16.to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
         let command = Command{cmd,data};
@@ -702,7 +697,7 @@ impl EPS {
                 println!{"System Config Response {:?}",x};
                 match match_stat(x[4]){
                     Ok(()) => Ok(x[6..].to_vec()),
-                    Err(e) => Err(e),
+                    = 8+size_of::<u32>();          Err(e) => Err(e),
                 }                 
             }            
             Err(_e) => Err(EpsError::TransferError),
@@ -713,7 +708,7 @@ impl EPS {
     pub fn get_ch_latchoff_ena_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
-        let id = 0x6004.to_le_bytes();
+        let id = 0x6004_u16.to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
         let command = Command{cmd,data};
@@ -741,7 +736,7 @@ impl EPS {
     pub fn get_ch_latchoff_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
-        let id = 0x6005.to_le_bytes();
+        let id = 0x6005_u16.to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
         let command = Command{cmd,data};
@@ -769,7 +764,7 @@ impl EPS {
     pub fn get_ttc_wdg_timeout(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
-        let id = 0x4000.to_le_bytes();
+        let id = 0x4000_u16.to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
         let command = Command{cmd,data};
@@ -797,7 +792,7 @@ impl EPS {
     pub fn get_ttc_wdg_timeout_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
-        let id = 0x4001.to_le_bytes();
+        let id = 0x4001_u16.to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
         let command = Command{cmd,data};
@@ -823,9 +818,1040 @@ impl EPS {
     }
 
 
+    pub fn get_ch_startup_delay(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x4002_u16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<u16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_ch_latchoff_delay(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x4022_u16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<u16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_safety_bolt_lothr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x4042_u16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<u16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_safety_volt_hithr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x4002_u16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<u16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+
+   
+    pub fn get_lothr_bp1_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3000_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+
+
+    pub fn get_lothr_bp2_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3001_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+
+    pub fn get_lothr_bp3_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3002_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+
+    pub fn get_hithr_bp1_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3003_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+
+
+    pub fn get_hithr_bp2_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3004_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
 
 
 
+    pub fn get_hithr_bp3_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3005_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_lothr_bp1_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3006_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_lothr_bp2_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3007_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_lothr_bp3_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3008_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_hithr_bp1_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3009_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_lothr_bp2_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x300A_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_lothr_bp3_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x300B_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_mcu_temp_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x300C_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_mcu_temp_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x300D_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_mcu_temp_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x300E_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_bp1_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x300F_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    pub fn get_bp1_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3006_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+
+
+    pub fn get_bp2_temp2_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3010_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+
+    pub fn get_bp3_temp3_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3011_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_bp2_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3012_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+
+    pub fn get_bp2_temp2_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3013_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+
+
+    pub fn get_bp2_temp3_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3014_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    
+    
+    pub fn get_bp3_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3015_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    
+    
+    pub fn get_bp3_temp2_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3016_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    
+    
+    
+    pub fn get_bp3_temp3_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3017_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    
+    
+    pub fn get_bp1_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3018_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    
+    pub fn get_bp1_temp2_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x3019_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    
+    
+    pub fn get_bp1_temp3_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x301A_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+    
+    pub fn get_bp2_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x301B_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+
+    pub fn get_bp2_temp2_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = 0x301C_i16.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};
+        let rx_len = 8+size_of::<i16>();
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+
+    pub fn get_config_para(&self, typ_stid: StID, id:u16, rx_len:u8) -> EpsResult<Vec<u8>> {
+        let cmd: u8 = match_st_id(typ_stid);
+
+        let id = id.to_le_bytes();
+        let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+
+        let command = Command{cmd,data};        
+        
+        let delay = Duration::from_millis(50);
+
+        #[cfg(feature = "debug")]
+        println!{"System Config Cmd{:?}",command};
+        rx_len = rx_len + 8;
+        match self.i2c.transfer(command, rx_len, delay) {
+            Ok(x) => {
+                #[cfg(feature = "debug")]
+                println!{"System Config Response {:?}",x};
+                match match_stat(x[4]){
+                    Ok(()) => Ok(x[6..].to_vec()),
+                    Err(e) => Err(e),
+                }                 
+            }            
+            Err(_e) => Err(EpsError::TransferError),
+        }
+
+    }
+
+    pub fn get_bp2_temp3_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+        let id = 0x301D;
+        let rx_len = size_of::<i16>();
+        self.get_config_para(typ_stid, id, rx_len)
+    }
+
+
+
+
+
+
+
+
+    
     // 0x82/0x84/0x86 Get/Set/Reset Configuration commands 
     // XL: Not sure how to handle the return
     pub fn system_config_command(&self, typ_stid: StID, mode: SysConfig1, para_id: u16) -> EpsResult<Vec<u8>> {
@@ -853,7 +1879,7 @@ impl EPS {
             0x90 => 8, 
             0xA0 => 8, 
             _=> return Err(EpsError::InvalidInput),
-        } 
+        }; 
 
         // Send command
         let rx_len = 8 + param_size;
@@ -912,10 +1938,33 @@ impl EPS {
         
         let cmd_code: u8 = CORRECT_TIME;
         let cmd: u8 = match_st_id(typ_stid);
-
-        let time_correction_bytes = time_correction.to_le_bytes();
-        let data = [&[ALL_IVID, cmd_code, OVERRIDE_BID], &time_correction_bytes[..]].concat();
-        let command = Command{cmd, data};
+        pub fn get_bp1_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+            let cmd: u8 = match_st_id(typ_stid);
+    
+            let id = 0x3018_i16.to_le_bytes();
+            let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
+    
+            let command = Command{cmd,data};
+            let rx_len = 8+size_of::<i16>();
+            
+            let delay = Duration::from_millis(50);
+    
+            #[cfg(feature = "debug")]
+            println!{"System Config Cmd{:?}",command};
+    
+            match self.i2c.transfer(command, rx_len, delay) {
+                Ok(x) => {
+                    #[cfg(feature = "debug")]
+                    println!{"System Config Response {:?}",x};
+                    match match_stat(x[4]){
+                        Ok(()) => Ok(x[6..].to_vec()),
+                        Err(e) => Err(e),
+                    }                 
+                }            
+                Err(_e) => Err(EpsError::TransferError),
+            }
+    
+        }      let command = Command{cmd, data};
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
