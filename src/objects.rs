@@ -155,9 +155,9 @@ pub struct VIPRawData {
 // Used in blocks across the HK telemetry.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct VIPData {
-    volt: i16,
-    curr: i16,
-    pwr: i16,
+    pub volt: i16,
+    pub curr: i16,
+    pub pwr: i16,
 }
 
 impl From<Vec<u8>> for VIPData {
