@@ -24,7 +24,7 @@
 // Dependancies
 use i2c_rs::{Command, Connection as I2c};
 
-use std::{time::Duration, intrinsics::size_of, mem::size_of};
+use std::time::Duration;
 use crate::objects::*;
 use failure::Fail;
 use std::convert::From;
@@ -206,7 +206,7 @@ fn match_stat(typ: u8) -> EpsResult<()> { // is it <T, Error> ?
     }
 }
 
-// STID match shortcut
+// StID match shortcut
 fn match_st_id(typ: StID) -> u8 {
     match typ {
         StID::PduStid => PDU_STID,
@@ -645,12 +645,12 @@ impl EPS {
 
     } 
 
-    pub fn set_config_para(&self, typ_stid: StID, id: u16, rx_len: u8, input: Vec<u8>) -> EpsResult<Vec<u8>> {
+    pub fn set_config_para(&self, typ_stid: StID, id: u16, mut rx_len: usize, mut input: Vec<u8>) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
         let id = id.to_le_bytes();
         let mut data: Vec<u8> = [ALL_IVID, SET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-        data.append(&input);
+        data.append(&mut input);
 
         let command = Command{cmd,data};        
         
@@ -672,7 +672,7 @@ impl EPS {
         }
     }
     
-    pub fn get_config_para(&self, typ_stid: StID, id:u16, rx_len:u8) -> EpsResult<Vec<u8>> {
+    pub fn get_config_para(&self, typ_stid: StID, id:u16, mut rx_len: usize) -> EpsResult<Vec<u8>> {
         let cmd: u8 = match_st_id(typ_stid);
 
         let id = id.to_le_bytes();
@@ -699,1639 +699,1633 @@ impl EPS {
 
     }
 
-    pub fn set_ch_startup_ena_bf(&self, typ_stid: STID, input: u32) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_ena_bf(&self, typ_stid: StID, input: u32) -> EpsResult<Vec<u8>> {
         let id = 0x6002;
-        let rx_len = size_of::<u32>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u32>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_ena_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_ena_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
     let id = 0x6002;
-    let rx_len = size_of::<u32>();
+    let rx_len = std::mem::size_of::<u32>();
     self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_key(&self, typ_stid: STID,input:u32) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_key(&self, typ_stid: StID,input:u32) -> EpsResult<Vec<u8>> {
         let id = 0x6003;
-        let rx_len = size_of::<u32>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u32>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_key(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6003;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_eba_bf(&self, typ_stid: STID,input:u32) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_eba_bf(&self, typ_stid: StID,input:u32) -> EpsResult<Vec<u8>> {
         let id = 0x6004;
-        let rx_len = size_of::<u32>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u32>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_eba_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_eba_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6004;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
 
-    pub fn set_ch_latchoff_key(&self, typ_stid: STID,input:u32) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_key(&self, typ_stid: StID,input:u32) -> EpsResult<Vec<u8>> {
         let id = 0x6005;
-        let rx_len = size_of::<u32>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u32>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_ch_latchoff_key(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6005;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ttc_wdg_timeout(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ttc_wdg_timeout(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4000;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ttc_wdg_timeout(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ttc_wdg_timeout(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4000;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
-    pub fn set_ttc_wdg_timeout_key(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ttc_wdg_timeout_key(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4001;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
-    pub fn get_ttc_wdg_timeout_key(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ttc_wdg_timeout_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4001;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4002;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4002;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay1(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay1(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4003;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay1(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay1(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4003;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay2(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay2(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4004;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay2(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay2(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4004;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay3(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay3(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4005;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay3(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay3(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4005;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay4(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay4(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4006;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }    
 
-    pub fn get_ch_startup_delay4(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay4(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4006;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay5(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay5(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4007;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay5(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay5(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4007;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay6(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay6(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4008;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay6(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay6(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4008;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay7(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay7(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4009;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay7(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay7(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4009;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay8(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay8(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x400A;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay8(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay8(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x400A;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay9(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay9(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x400B;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay9(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay9(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x400B;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay10(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay10(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x400C;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay10(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay10(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x400C;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay11(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay11(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x400D;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay11(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay11(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x400D;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay12(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay12(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x400E;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay12(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay12(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x400E;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay13(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay13(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x400F;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay13(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay13(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x400F;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay14(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay14(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4010;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay14(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay14(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4010;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay15(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay15(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4011;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay15(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay15(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4011;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay16(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay16(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4012;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay16(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay16(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4012;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay17(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay17(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4013;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay17(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay17(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4013;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay18(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay18(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4014;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay18(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay18(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4014;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay19(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay19(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4015;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay19(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay19(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4015;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay20(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay20(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4016;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay20(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay20(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4016;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay21(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay21(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4017;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay21(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay21(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4017;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay22(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay22(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4018;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay22(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay22(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4018;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay23(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay23(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4019;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay23(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay23(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4019;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay24(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay24(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x401A;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay24(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay24(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x401A;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay25(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay25(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x401B;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay25(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay25(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x401B;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay26(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay26(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x401C;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay26(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay26(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x401C;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay27(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay27(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x401D;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay27(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay27(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x401D;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay28(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay28(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x401E;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay28(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay28(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x401E;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay29(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay29(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x401F;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay29(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay29(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x401F;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay30(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay30(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4020;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay30(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay30(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4020;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_startup_delay31(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_startup_delay31(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4021;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_startup_delay31(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_delay31(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4021;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay(&self, typ_stid: STID,input;u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay(&self, typ_stid: StID,input: u16) -> EpsResult<Vec<u8>> {
         let id = 0x4022;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4022;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay1(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay1(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4023;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay1(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay1(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4023;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay2(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay2(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4024;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay2(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay2(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4024;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay3(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay3(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4025;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay3(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay3(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4025;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay4(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay4(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4026;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay4(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay4(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4026;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay5(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay5(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4027;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay5(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay5(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4027;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay6(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay6(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4028;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay6(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay6(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4028;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay7(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay7(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4029;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay7(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay7(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4029;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay8(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay8(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x402A;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay8(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay8(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x402A;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay9(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay9(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x402B;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay9(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay9(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x402B;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay10(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay10(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x402C;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay10(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay10(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x402C;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay11(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay11(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x402D;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay11(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay11(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x402D;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay12(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay12(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x402E;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay12(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay12(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x402E;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay13(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay13(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x402F;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay13(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay13(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x402F;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay14(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay14(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4030;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay14(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay14(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4030;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay15(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay15(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4031;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay15(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay15(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4031;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay16(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay16(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4032;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay16(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay16(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4032;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay17(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay17(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4033;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay17(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay17(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4033;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ch_latchoff_delay18(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay18(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4034;
-        let rx_len = size_of::<u16>();
-        self.get_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay18(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay18(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4034;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay19(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay19(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4035;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay19(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay19(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4035;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay20(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay20(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4036;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay20(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay20(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4036;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay21(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay21(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4037;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay21(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay21(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4037;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay22(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay22(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4038;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay22(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay22(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4038;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay23(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay23(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4039;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay23(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay23(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4039;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay24(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay24(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x403A;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay24(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay24(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x403A;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay25(&self, typ_stid: STID,input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay25(&self, typ_stid: StID,input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x403B;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay25(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay25(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x403B;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay26(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay26(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x403C;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay26(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay26(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x403C;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay27(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay27(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x403D;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay27(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay27(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x403D;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ch_latchoff_delay28(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay28(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x403E;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay28(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay28(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x403E;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn set_ch_latchoff_delay29(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay29(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x403F;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay29(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay29(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x403F;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ch_latchoff_delay30(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay30(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4040;
-        let rx_len = size_of::<u16>();
-        self.get_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
     
-    pub fn get_ch_latchoff_delay30(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay30(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4040;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ch_latchoff_delay31(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_ch_latchoff_delay31(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4041;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ch_latchoff_delay31(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latchoff_delay31(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4041;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_safety_volt_lothr(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_safety_volt_lothr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4042;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_safety_volt_lothr(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_safety_volt_lothr(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4042;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_safety_volt_hithr(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_safety_volt_hithr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4043;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_safety_volt_hithr(&self, typ_stid: STID, input:u16) -> EpsResult<Vec<u8>> {
+    pub fn set_safety_volt_hithr(&self, typ_stid: StID, input:u16) -> EpsResult<Vec<u8>> {
         let id = 0x4043;
-        let rx_len = size_of::<u16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_lothr_bp1_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_lothr_bp1_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3000;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_lothr_bp1_heater(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_lothr_bp1_heater(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3000;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_lothr_bp2_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_lothr_bp2_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3001;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_lothr_bp2_heater(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_lothr_bp2_heater(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3001;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_lothr_bp3_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_lothr_bp3_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3002;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_lothr_bp3_heater(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_lothr_bp3_heater(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3002;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_hithr_bp1_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_hithr_bp1_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3003;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_hithr_bp1_heater(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_hithr_bp1_heater(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3003;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_hithr_bp2_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_hithr_bp2_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3004;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_hithr_bp2_heater(&self, typ_stid: STID,input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_hithr_bp2_heater(&self, typ_stid: StID,input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3004;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_hithr_bp3_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn set_hithr_bp3_heater(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3005;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
+    }
+
+    pub fn get_hithr_bp3_heater(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let id = 0x3005;
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_hithr_bp3_heater(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
-        let id = 0x3005;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
-    }
-
-    pub fn get_hithr_bp3_heater(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
-        let id = 0x3005;
-        let rx_len = size_of::<i16>();
-        self.get_config_para(typ_stid, id, rx_len)
-    }
-
-    pub fn get_lothr_bp1_unbal(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_lothr_bp1_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3006;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_lothr_bp1_unbal(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_lothr_bp1_unbal(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3006;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_lothr_bp2_unbal(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_lothr_bp2_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3007;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_lothr_bp2_unbal(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_lothr_bp2_unbal(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3007;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_lothr_bp3_unbal(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_lothr_bp3_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3008;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_lothr_bp3_unbal(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_lothr_bp3_unbal(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3008;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_hithr_bp1_unbal(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_hithr_bp1_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3009;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_hithr_bp1_unbal(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_hithr_bp1_unbal(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3009;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_hithr_bp2_unbal(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_hithr_bp2_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x300A;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_hithr_bp2_unbal(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_hithr_bp2_unbal(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x300A;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_hithr_bp3_unbal(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_hithr_bp3_unbal(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x300B;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_hithr_bp3_unbal(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_hithr_bp3_unbal(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x300B;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_mcu_temp_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_mcu_temp_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x300C;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_mcu_temp_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_mcu_temp_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x300C;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_mcu_temp_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_mcu_temp_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x300D;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_mcu_temp_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_mcu_temp_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x300D;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_mcu_temp_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_mcu_temp_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x300E;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_mcu_temp_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_mcu_temp_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x300E;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp1_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x300F;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp1_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp1_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x300F;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp2_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp2_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3010;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp2_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp2_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3010;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp3_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp3_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3011;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp3_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp3_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3011;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp2_temp1_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3012;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp1_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp1_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3012;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_bp2_temp2_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp2_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3013;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp2_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp2_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3013;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp2_temp3_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp3_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3014;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp3_bias(&self, typ_stid: STID,input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp3_bias(&self, typ_stid: StID,input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3014;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp1_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp1_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3015;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp1_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp1_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3015;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp2_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp2_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3016;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp2_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp2_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3016;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp3_bias(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp3_bias(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3017;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp3_bias(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp3_bias(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3017;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp1_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3018;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp1_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp1_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3018;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_bp1_temp2_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp2_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3019;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp2_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp2_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3019;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_bp1_temp3_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp3_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x301A;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp3_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp3_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x301A;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp2_temp1_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x301B;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp1_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp1_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x301B;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
     
-    pub fn get_bp2_temp3_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
-        let id = 0x301B;
-        let rx_len = size_of::<i16>();
+    pub fn get_bp2_temp2_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let id = 0x301C;
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
     
-    pub fn set_bp2_temp3_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
-        let id = 0x301B;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+    pub fn set_bp2_temp2_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
+        let id = 0x301C;
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
    
-    pub fn get_bp2_temp3_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp3_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x301D;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp3_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp3_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x301D;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp1_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x301E;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp1_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp1_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x301E;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp2_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp2_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x301F;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp2_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp2_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x301F;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp3_premul(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp3_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3020;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp3_premul(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp3_premul(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3020;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp1_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp1_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3021;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp1_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp1_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3021;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp2_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp2_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3022;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp2_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp2_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3022;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp1_temp3_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp1_temp3_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3023;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp1_temp3_posdiv(&self, typ_stid: STID,input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp1_temp3_posdiv(&self, typ_stid: StID,input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3023;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp2_temp1_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp1_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3024;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp1_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp1_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3024;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
     
-    pub fn get_bp2_temp2_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp2_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3025;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp2_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp2_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3025;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp2_temp3_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp2_temp3_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3026;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp2_temp3_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp2_temp3_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3026;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp1_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp1_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3027;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp1_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp1_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3027;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_bp3_temp2_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp2_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3028;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp2_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp2_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3028;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_bp3_temp3_posdiv(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bp3_temp3_posdiv(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3029;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_bp3_temp3_posdiv(&self, typ_stid: STID, input:i16) -> EpsResult<Vec<u8>> {
+    pub fn set_bp3_temp3_posdiv(&self, typ_stid: StID, input:i16) -> EpsResult<Vec<u8>> {
         let id = 0x3029;
-        let rx_len = size_of::<i16>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i16>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_board_identifier(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_board_identifier(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2000;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_board_identifier(&self, typ_stid: STID, input:u8) -> EpsResult<Vec<u8>> {
+    pub fn set_board_identifier(&self, typ_stid: StID, input:u8) -> EpsResult<Vec<u8>> {
         let id = 0x2000;
-        let rx_len = size_of::<u8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_board_identifier_key(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_board_identifier_key(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2001;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_board_identifier_key(&self, typ_stid: STID, input:u8) -> EpsResult<Vec<u8>> {
+    pub fn set_board_identifier_key(&self, typ_stid: StID, input:u8) -> EpsResult<Vec<u8>> {
         let id = 0x2001;
-        let rx_len = size_of::<u8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_ravg_strength_p2(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ravg_strength_p2(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2000;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_ravg_strength_p2(&self, typ_stid: STID, input:u8) -> EpsResult<Vec<u8>> {
+    pub fn set_ravg_strength_p2(&self, typ_stid: StID, input:u8) -> EpsResult<Vec<u8>> {
         let id = 0x2000;
-        let rx_len = size_of::<u8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<u8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_auto_heat_ena_bp1(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_auto_heat_ena_bp1(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1001;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_auto_heat_ena_bp1(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_auto_heat_ena_bp1(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1001;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_auto_heat_ena_bp2(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_auto_heat_ena_bp2(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1002;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_auto_heat_ena_bp2(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_auto_heat_ena_bp2(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1002;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_auto_heat_ena_bp3(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_auto_heat_ena_bp3(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1003;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_auto_heat_ena_bp3(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_auto_heat_ena_bp3(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1003;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_auto_bal_ena_bp1(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_auto_bal_ena_bp1(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1004;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_auto_bal_ena_bp1(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_auto_bal_ena_bp1(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1004;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_auto_bal_ena_bp2(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_auto_bal_ena_bp2(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1005;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_auto_bal_ena_bp2(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_auto_bal_ena_bp2(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1005;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_auto_bal_ena_bp3(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_auto_bal_ena_bp3(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1006;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_auto_bal_ena_bp3(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_auto_bal_ena_bp3(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1006;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd1_always_ena(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd1_always_ena(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1007;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd1_always_ena(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd1_always_ena(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1007;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd2_always_ena(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd2_always_ena(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1008;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd2_always_ena(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd2_always_ena(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1008;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd3_always_ena(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd3_always_ena(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1009;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd3_always_ena(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd3_always_ena(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1009;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_vd4_always_ena(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd4_always_ena(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x100A;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd4_always_ena(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd4_always_ena(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x100A;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len,input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_vd5_always_ena(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd5_always_ena(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x100B;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd5_always_ena(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd5_always_ena(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x100B;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input:i8)
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd6_always_ena(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd6_always_ena(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x100C;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd6_always_ena(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd6_always_ena(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x100C;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
-    pub fn get_vd1_always_disa(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd1_always_disa(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x100E;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd1_always_disa(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd1_always_disa(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x100E;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd2_always_disa(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd2_always_disa(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x100F;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd2_always_disa(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd2_always_disa(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x100F;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd3_always_disa(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd3_always_disa(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1010;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd3_always_disa(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd3_always_disa(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1010;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd4_always_disa(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd4_always_disa(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1011;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd4_always_disa(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd4_always_disa(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1011;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd5_always_disa(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd5_always_disa(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1012;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd5_always_disa(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd5_always_disa(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1012;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
-    pub fn get_vd6_always_disa(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd6_always_disa(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1013;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn set_vd6_always_disa(&self, typ_stid: STID, input:i8) -> EpsResult<Vec<u8>> {
+    pub fn set_vd6_always_disa(&self, typ_stid: StID, input:i8) -> EpsResult<Vec<u8>> {
         let id = 0x1013;
-        let rx_len = size_of::<i8>();
-        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes())
+        let rx_len = std::mem::size_of::<i8>();
+        self.set_config_para(typ_stid, id, rx_len, input.to_le_bytes().to_vec())
     }
 
 
@@ -2340,219 +2334,219 @@ impl EPS {
 
 
 
-    pub fn get_ch_force_ena_use_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_force_ena_use_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6809;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ch_startup_ena_use_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_startup_ena_use_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x680A;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ch_latch_off_ena_use_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ch_latch_off_ena_use_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x680B;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_vd1_alloc_ch_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd1_alloc_ch_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x680C;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_vd2_alloc_ch_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd2_alloc_ch_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x680D;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_vd3_alloc_ch_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd3_alloc_ch_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x680E;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_vd4_alloc_ch_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd4_alloc_ch_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x680F;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_vd5_alloc_ch_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd5_alloc_ch_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6810;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_vd6_alloc_ch_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_vd6_alloc_ch_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6811;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_swci_ch_cmd_ena_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_swci_ch_cmd_ena_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6813;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_swci_ch_cmd_disa_bf(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_swci_ch_cmd_disa_bf(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x6814;
-        let rx_len = size_of::<u32>();
+        let rx_len = std::mem::size_of::<u32>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ttc_i2c_slave_addr(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ttc_i2c_slave_addr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4800;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_conf_nvm_save_cntr(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_conf_nvm_save_cntr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4801;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_conf_nvm_save_chks(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_conf_nvm_save_chks(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4802;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_cause(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_cause(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4803;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_cntr_pwron(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_cntr_pwron(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4804;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_cntr_wdg(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_cntr_wdg(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4805;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_cntr_cmd(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_cntr_cmd(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4806;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_cntr_mcu(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_cntr_mcu(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4807;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_cntr_emlopo(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_cntr_emlopo(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4808;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_rst_code_mcu_raw(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_rst_code_mcu_raw(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4809;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_emlopo_volt_lothr(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_emlopo_volt_lothr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x480A;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_emlopo_volt_hithr(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_emlopo_volt_hithr(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x480B;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_emlopo_period(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
-        let id = 0x480C
-        let rx_len = size_of::<u16>();
+    pub fn get_emlopo_period(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
+        let id = 0x480C;
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_safety_volt_lothr_used(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_safety_volt_lothr_used(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x480D;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_safety_volt_hithr_used(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_safety_volt_hithr_used(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x480E;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_safety_linger(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_safety_linger(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x480F;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ttc_wdg_timout_used(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ttc_wdg_timout_used(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4810;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ttc_prevcmd_elapsed(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ttc_prevcmd_elapsed(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x4811;
-        let rx_len = size_of::<u16>();
+        let rx_len = std::mem::size_of::<u16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_adc_mcu_temp_v25_t30(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_adc_mcu_temp_v25_t30(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3800;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_adc_mcu_temp_v25_t85(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_adc_mcu_temp_v25_t85(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x3801;
-        let rx_len = size_of::<i16>();
+        let rx_len = std::mem::size_of::<i16>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_stid(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_stid(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2800;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_ivid(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_ivid(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2801;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_bid_used(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_bid_used(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2802;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_boot_resume_short(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_boot_resume_short(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x2803;
-        let rx_len = size_of::<u8>();
+        let rx_len = std::mem::size_of::<u8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
-    pub fn get_conf_param_changed(&self, typ_stid: STID) -> EpsResult<Vec<u8>> {
+    pub fn get_conf_param_changed(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
         let id = 0x1800;
-        let rx_len = size_of::<i8>();
+        let rx_len = std::mem::size_of::<i8>();
         self.get_config_para(typ_stid, id, rx_len)
     }
 
@@ -2676,33 +2670,11 @@ impl EPS {
         
         let cmd_code: u8 = CORRECT_TIME;
         let cmd: u8 = match_st_id(typ_stid);
-        pub fn get_bp1_temp1_premul(&self, typ_stid: StID) -> EpsResult<Vec<u8>> {
-            let cmd: u8 = match_st_id(typ_stid);
-    
-            let id = 0x3018_i16.to_le_bytes();
-            let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-    
-            let command = Command{cmd,data};
-            let rx_len = 8+size_of::<i16>();
-            
-            let delay = Duration::from_millis(50);
-    
-            #[cfg(feature = "debug")]
-            println!{"System Config Cmd{:?}",command};
-    
-            match self.i2c.transfer(command, rx_len, delay) {
-                Ok(x) => {
-                    #[cfg(feature = "debug")]
-                    println!{"System Config Response {:?}",x};
-                    match match_stat(x[4]){
-                        Ok(()) => Ok(x[6..].to_vec()),
-                        Err(e) => Err(e),
-                    }                 
-                }            
-                Err(_e) => Err(EpsError::TransferError),
-            }
-    
-        }      let command = Command{cmd, data};
+        
+        let mut data: Vec<u8> = [ALL_IVID, 0xC4, OVERRIDE_BID].to_vec();
+        data.append(&mut time_correction.to_le_bytes().to_vec());
+        
+        let command = Command{cmd, data};
 
         let rx_len = 1;
         let delay = Duration::from_millis(50);
