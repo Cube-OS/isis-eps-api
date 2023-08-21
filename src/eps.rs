@@ -22,8 +22,7 @@
 // at the University of Sydney
 
 // Dependancies
-use rust_i2c::{Command, Connection as I2c};
-// use rust_udp::{Connection as Udp};
+use i2c_rs::{Command, Connection as I2c};
 
 use std::{time::Duration, intrinsics::size_of, mem::size_of};
 use crate::objects::*;
