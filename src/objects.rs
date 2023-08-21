@@ -546,73 +546,73 @@ pub struct PCUHk {
 pub struct PIUHk {
     // One reseved byte. Starting from the 6th byte
     // Voltage of internal board supply.
-    volt_brdsup: i16,
+    pub volt_brdsup: i16,
     // Measured temperature of the MCU
-    temp: i16,
+    pub temp: i16,
     // Input V, I and P input of the distribution part of the unit in raw form.
-    vip_dist_input: VIPData,
+    pub vip_dist_input: VIPData,
     // Input V, I and P input of the battery part of the unit 
-    vip_batt_input: VIPData,
+    pub vip_batt_input: VIPData,
     // Bitflag field indicating channel-on status for output 0 through 15.
-    stat_ch_on:u16,
+    pub stat_ch_on:u16,
     // Bitflag field indicating overcurrent latch-off fault for output 0 through 15.
-    stat_ch_ocf:u16,
+    pub stat_ch_ocf:u16,
     // Bitflag field indicating BP board status.
-    batt_stat:u16,
+    pub batt_stat:u16,
     // 2 and 4 cell battery pack
-    batt_temp2:i16,
+    pub batt_temp2:i16,
     // 2 cell battery pack not used, temp for 4 cell battery pack:
-    batt_temp3:i16,
+    pub batt_temp3:i16,
     // Voltage level for domain 0 - 2
-    volt_vd0:i16,
-    volt_vd1:i16,
-    volt_vd2:i16,
+    pub volt_vd0:i16,
+    pub volt_vd1:i16,
+    pub volt_vd2:i16,
     // VIPData output for channel 0 - 16
     // VD0_0, 3.3V
-    vip_cnt_ch00: VIPData,
+    pub vip_cnt_ch00: VIPData,
     // VD1_0, 5V
-    vip_cnt_ch01: VIPData,
+    pub vip_cnt_ch01: VIPData,
     // VD1_1, 5V
-    vip_cnt_ch02: VIPData,
+    pub vip_cnt_ch02: VIPData,
     // VD1_2, 5V
-    vip_cnt_ch03: VIPData,
+    pub vip_cnt_ch03: VIPData,
     // VD1_3, 3.3V
-    vip_cnt_ch04: VIPData,
+    pub vip_cnt_ch04: VIPData,
     // VD2_0, 3.3V
-    vip_cnt_ch05: VIPData,
+    pub vip_cnt_ch05: VIPData,
     // VD2_1, 3.3V
-    vip_cnt_ch06: VIPData,
+    pub vip_cnt_ch06: VIPData,
     // VD2_2, 3.3V
-    vip_cnt_ch07: VIPData,
+    pub vip_cnt_ch07: VIPData,
     // VD2_3, 3.3V
-    vip_cnt_ch08: VIPData,
+    pub vip_cnt_ch08: VIPData,
     // Data on conditioning chain
-    ccd1: CondChnShortData,
-    ccd2: CondChnShortData,
-    ccd3: CondChnShortData,
+    pub ccd1: CondChnShortData,
+    pub ccd2: CondChnShortData,
+    pub ccd3: CondChnShortData,
     // VD0_1, 3.3V 
-    vip_cnt_ch09: VIPData,
+    pub vip_cnt_ch09: VIPData,
     // VD0_2, 3.3V    
-    vip_cnt_ch10: VIPData,
+    pub vip_cnt_ch10: VIPData,
     // VD0_3, 3.3V    
-    vip_cnt_ch11: VIPData,
+    pub vip_cnt_ch11: VIPData,
     // VD3_0, 5.4V (customized)
-    vip_cnt_ch12: VIPData,
+    pub vip_cnt_ch12: VIPData,
     // VD3_1, 5.4V (customized)
-    vip_cnt_ch13: VIPData,
+    pub vip_cnt_ch13: VIPData,
     // VD4_0, 12V (customized)
-    vip_cnt_ch14: VIPData,
+    pub vip_cnt_ch14: VIPData,
     // VD4_1, 12V (customized)
-    vip_cnt_ch15: VIPData,
+    pub vip_cnt_ch15: VIPData,
     // Data on conditioning chain 
-    ccd4: CondChnShortData,
-    ccd5: CondChnShortData,
+    pub ccd4: CondChnShortData,
+    pub ccd5: CondChnShortData,
     // Bitflag field indicating channel-on status for the extended output bus channels
-    stat_ch_ext_on: u16,
+    pub stat_ch_ext_on: u16,
     // Bitflag field indicating overcurrent latch-off fault status for the extended output bus channels
-    stat_ch_ext_ocf: u16,
+    pub stat_ch_ext_ocf: u16,
     // VD5_0, 28.2V (default)
-    vip_cnt_ch16: VIPData,
+    pub vip_cnt_ch16: VIPData,
     // Stop at 184 byte for the ICEPSv2
 }
 
