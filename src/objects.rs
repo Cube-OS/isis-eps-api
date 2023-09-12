@@ -25,6 +25,7 @@
 // System Type Identifier (STID)
 
 use serde::*;
+use crate::error::*;
 use strum_macros::{EnumString,Display,EnumIter};
 use strum::IntoEnumIterator;
 
@@ -43,93 +44,290 @@ pub enum StID {
 }
 
 // Output Bus Group 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum BusGroup {
+    #[default]
     BusGroupOn,
     BusGroupOff,
     BusGroupState,
 }
 
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
+pub struct BusChannelState {
+    pub ch00: BusChannel,
+    pub ch01: BusChannel,
+    pub ch02: BusChannel,
+    pub ch03: BusChannel,
+    pub ch04: BusChannel,
+    pub ch05: BusChannel,
+    pub ch06: BusChannel,
+    pub ch07: BusChannel,
+    pub ch08: BusChannel,
+    pub ch09: BusChannel,
+    pub ch10: BusChannel,
+    pub ch11: BusChannel,
+    pub ch12: BusChannel,
+    pub ch13: BusChannel,
+    pub ch14: BusChannel,
+    pub ch15: BusChannel,
+}
+impl BusChannelState {
+    pub fn on(&self) -> u16 {
+        let mut u = 0u16;
+        if self.ch00.is_on() {u |= 0x0001;}
+        if self.ch01.is_on() {u |= 0x0002;}
+        if self.ch02.is_on() {u |= 0x0004;}
+        if self.ch03.is_on() {u |= 0x0008;}
+        if self.ch04.is_on() {u |= 0x0010;}
+        if self.ch05.is_on() {u |= 0x0020;}
+        if self.ch06.is_on() {u |= 0x0040;}
+        if self.ch07.is_on() {u |= 0x0080;}
+        if self.ch08.is_on() {u |= 0x0100;}
+        if self.ch09.is_on() {u |= 0x0200;}
+        if self.ch10.is_on() {u |= 0x0400;}
+        if self.ch11.is_on() {u |= 0x0800;}
+        if self.ch12.is_on() {u |= 0x1000;}
+        if self.ch13.is_on() {u |= 0x2000;}
+        if self.ch14.is_on() {u |= 0x4000;}
+        if self.ch15.is_on() {u |= 0x8000;}
+        u
+    }
+    pub fn off(&self) -> u16 {
+        let mut u = 0u16;
+        if self.ch00.is_off() {u |= 0x0001;}
+        if self.ch01.is_off() {u |= 0x0002;}
+        if self.ch02.is_off() {u |= 0x0004;}
+        if self.ch03.is_off() {u |= 0x0008;}
+        if self.ch04.is_off() {u |= 0x0010;}
+        if self.ch05.is_off() {u |= 0x0020;}
+        if self.ch06.is_off() {u |= 0x0040;}
+        if self.ch07.is_off() {u |= 0x0080;}
+        if self.ch08.is_off() {u |= 0x0100;}
+        if self.ch09.is_off() {u |= 0x0200;}
+        if self.ch10.is_off() {u |= 0x0400;}
+        if self.ch11.is_off() {u |= 0x0800;}
+        if self.ch12.is_off() {u |= 0x1000;}
+        if self.ch13.is_off() {u |= 0x2000;}
+        if self.ch14.is_off() {u |= 0x4000;}
+        if self.ch15.is_off() {u |= 0x8000;}
+        u
+    }
+    pub fn state(&self) -> EpsResult<u16> {
+        let mut u = 0u16;
+        match self.ch00 {
+            BusChannel::On => u |= 0x0001,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch01 {
+            BusChannel::On => u |= 0x0002,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch02 {
+            BusChannel::On => u |= 0x0004,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch03 {
+            BusChannel::On => u |= 0x0008,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch04 {
+            BusChannel::On => u |= 0x0010,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch05 {
+            BusChannel::On => u |= 0x0020,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch06 {
+            BusChannel::On => u |= 0x0040,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch07 {
+            BusChannel::On => u |= 0x0080,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch08 {
+            BusChannel::On => u |= 0x0100,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch09 {
+            BusChannel::On => u |= 0x0200,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch10 {
+            BusChannel::On => u |= 0x0400,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch11 {
+            BusChannel::On => u |= 0x0800,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch12 {
+            BusChannel::On => u |= 0x1000,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch13 {
+            BusChannel::On => u |= 0x2000,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch14 {
+            BusChannel::On => u |= 0x4000,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        match self.ch15 {
+            BusChannel::On => u |= 0x8000,
+            BusChannel::Off => u |= 0x0000,
+            _ => return Err(EpsError::InvalidBusChannelState),
+        }
+        Ok(u)
+    }
+}
+impl From<u16> for BusChannelState {
+    fn from(u: u16) -> BusChannelState {
+        BusChannelState {
+            ch00: if (u & 0x0001)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch01: if (u & 0x0002)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch02: if (u & 0x0004)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch03: if (u & 0x0008)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch04: if (u & 0x0010)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch05: if (u & 0x0020)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch06: if (u & 0x0040)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch07: if (u & 0x0080)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch08: if (u & 0x0100)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch09: if (u & 0x0200)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch10: if (u & 0x0400)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch11: if (u & 0x0800)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch12: if (u & 0x1000)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch13: if (u & 0x2000)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch14: if (u & 0x4000)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch15: if (u & 0x8000)!=0 {BusChannel::On} else {BusChannel::Off},
+        }
+    }
+}
+
 // Output Bus Channel
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
 pub enum BusChannel {
-    ChannelOn,
-    ChannelOff,
+    #[default]
+    Keep,
+    On,
+    Off,    
+}
+impl BusChannel {
+    pub fn is_on(&self) -> bool {
+        match self {
+            BusChannel::On => true,
+            _ => false,
+        }
+    }
+    pub fn is_off(&self) -> bool {
+        match self {
+            BusChannel::Off => true,
+            _ => false,
+        }
+    }
 }
 
 // Used in ModeSwitch (0x30/0x31)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum ModeSwitch {
+    #[default]
     Nominal,
     Safety,
 }
 
 // Reset status, used in get system status (0x40)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
 pub enum EpsMode {
+    #[default]
     Startup,
     Nominal,
     Safety,
     Contigency,
 }
-
-// Reset status, used in get system status (0x40)
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
-pub enum ConfStatus {
-    NotAltered,
-    Altered,
+impl TryFrom<u8> for EpsMode {
+    type Error = EpsError;
+    fn try_from(v: u8) -> EpsResult<EpsMode> {
+        match v {
+            0 => Ok(EpsMode::Startup),
+            1 => Ok(EpsMode::Nominal),
+            2 => Ok(EpsMode::Safety),
+            3 => Ok(EpsMode::Contigency),
+            _ => Err(EpsError::InvalidEpsMode),
+        }
+    }
 }
 
 // Reset status, used in get system status (0x40)
-// #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
-// pub enum ResetCause {
-//     PowerOn,
-//     Watchdog,
-//     Commanded,
-//     EpsUpset,
-//     EmergLowPwr,
-// }
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+pub enum ResetCause {
+    #[default]
+    PowerOn,
+    Watchdog,
+    Commanded,
+    EpsUpset,
+    EmergLowPwr,
+}
+impl TryFrom<u8> for ResetCause {
+    type Error = EpsError;
+    fn try_from(v: u8) -> EpsResult<ResetCause> {
+        match v {
+            0 => Ok(ResetCause::PowerOn),
+            1 => Ok(ResetCause::Watchdog),
+            2 => Ok(ResetCause::Commanded),
+            3 => Ok(ResetCause::EpsUpset),
+            4 => Ok(ResetCause::EmergLowPwr),
+            _ => Err(EpsError::InvalidResetCause),
+        }
+    }
+}
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PDUHkSel {
-    // PDURawHK,
+    PDURawHK,
+    #[default]
     PDUEngHK,
     PDUAvgHK,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PBUHkSel {
-    // PBURawHK,
+    PBURawHK,
+    #[default]
     PBUEngHK,
     PBUAvgHK,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PCUHkSel {
-    // PCURawHK,
+    PCURawHK,
+    #[default]
     PCUEngHK,
     PCUAvgHK,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PIUHkSel {
-    // PIURawHK,
+    PIURawHK,
+    #[default]
     PIUEngHK,
     PIUAvgHK, 
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
-pub enum SysConfig1 {
-    GetConfigParam, 
-    SetConfigParam, 
-    ResetConfigParam,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
-pub enum SysConfig2 {
-    ResetAll, 
-    LoadConfig, 
-    SaveConfig, 
 }
  
 // The voltage V - current I - power P datatype (VIPD) raw data. 
@@ -243,22 +441,22 @@ impl From<Vec<u8>> for BattPackStatus {
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct BattPackData{
-    vip_bp_output: VIPData,
-    stat_bp: i16,
-    volt_cell1: i16,
-    volt_cell2: i16,
-    volt_cell3: i16,
-    volt_cell4: i16,
-    bat_temp1: i16,
-    bat_temp2: i16,
-    bat_temp3: i16,
+    pub vip_bp_output: VIPData,
+    pub stat_bp: u16,
+    pub volt_cell1: i16,
+    pub volt_cell2: i16,
+    pub volt_cell3: i16,
+    pub volt_cell4: i16,
+    pub bat_temp1: i16,
+    pub bat_temp2: i16,
+    pub bat_temp3: i16,
 }
 
 impl From<Vec<u8>> for BattPackData {
     fn from(v: Vec<u8>) -> BattPackData {
         BattPackData{
             vip_bp_output: VIPData::from(v[0..6].to_vec()),
-            stat_bp: <i16>::from_le_bytes([v[6],v[7]]),
+            stat_bp: <u16>::from_le_bytes([v[6],v[7]]),
             volt_cell1: <i16>::from_le_bytes([v[8],v[9]]),
             volt_cell2: <i16>::from_le_bytes([v[10],v[11]]),
             volt_cell3: <i16>::from_le_bytes([v[12],v[13]]),
@@ -340,11 +538,11 @@ Structure takes the 5th offset byte (0 to 4 are fixed) as the first byte of the 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct SystemStatus {
     // 0 = startup; 1 = nominal; 2 = safety; 3 = emergency low power
-    mode: u8,
+    mode: EpsMode,
     // Configuration parameters have been changed since the last parameters load/save operation
-    conf: u8,
+    conf: bool,
     // Reset cause
-    reset_cause: u8,
+    reset_cause: ResetCause,
     // Uptime since system start expressed in seconds.
     uptime: u32,
     //First internal error encountered during the system control cycle
@@ -377,12 +575,15 @@ pub struct SystemStatus {
     unix_second: u8,
 }
 
-impl From<Vec<u8>> for SystemStatus {
-    fn from(v: Vec<u8>) -> SystemStatus {
-        SystemStatus{
-            mode: v[5],
-            conf: v[6],
-            reset_cause: v[7],
+impl TryFrom<Vec<u8>> for SystemStatus {
+    type Error = EpsError;
+    fn try_from(v: Vec<u8>) -> EpsResult<SystemStatus> {
+        let mode = EpsMode::try_from(v[5])?;
+        let reset_cause = ResetCause::try_from(v[7])?;
+        Ok(SystemStatus{
+            mode,
+            conf: v[6] & 0x01 != 0,
+            reset_cause,
             uptime: <u32>::from_le_bytes([v[8],v[9],v[10],v[11]]),
             error: <u16>::from_le_bytes([v[12],v[13]]),
             rc_cnt_pwron: <u16>::from_le_bytes([v[14],v[15]]),
@@ -398,11 +599,51 @@ impl From<Vec<u8>> for SystemStatus {
             unix_hour: v[33],
             unix_minute: v[34],
             unix_second: v[35],
-        }
+        })
     }
 }
 
-
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
+pub struct ChannelOverCurrentState {
+    ch00: bool,
+    ch01: bool,
+    ch02: bool,
+    ch03: bool,
+    ch04: bool,
+    ch05: bool,
+    ch06: bool,
+    ch07: bool,
+    ch08: bool,
+    ch09: bool,
+    ch10: bool,
+    ch11: bool,
+    ch12: bool,
+    ch13: bool,
+    ch14: bool,
+    ch15: bool,
+}
+impl From<u16> for ChannelOverCurrentState {
+    fn from(u: u16) -> ChannelOverCurrentState {
+        ChannelOverCurrentState{
+            ch00: (u & 0x0001)!=0,
+            ch01: (u & 0x0002)!=0,
+            ch02: (u & 0x0004)!=0,
+            ch03: (u & 0x0008)!=0,
+            ch04: (u & 0x0010)!=0,
+            ch05: (u & 0x0020)!=0,
+            ch06: (u & 0x0040)!=0,
+            ch07: (u & 0x0080)!=0,
+            ch08: (u & 0x0100)!=0,
+            ch09: (u & 0x0200)!=0,
+            ch10: (u & 0x0400)!=0,
+            ch11: (u & 0x0800)!=0,
+            ch12: (u & 0x1000)!=0,
+            ch13: (u & 0x2000)!=0,
+            ch14: (u & 0x4000)!=0,
+            ch15: (u & 0x8000)!=0,
+        }
+    }
+}
 
 // Overcurrent Fault State （0x42）
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
@@ -410,13 +651,13 @@ pub struct OverCurrentFaultState {
     // One reseved byte. Starting from the 6th byte
     // Length of useful data for ICEPSv2 (17 channels), 50bytes
     // Bitflag field indicating channel-on status. 1 means corresponding output bus is enabled
-    stat_ch_on: u16,
+    stat_ch_on: BusChannelState,
     // Bitflag field indicating channel-on fault status
-    stat_ch_ext_on: u16,
+    stat_ch_ext_on: BusChannelState,
     // Bitflag field indicating overcurrent status. 1 means corresponding output bus is latched off
-    stat_ch_ocf: u16,
+    stat_ch_ocf: ChannelOverCurrentState,
     // Bitflag field indicating overcurrent fault status 
-    stat_ch_ext_ocf: u16,
+    stat_ch_ext_ocf: ChannelOverCurrentState,
     // VD0_0, 3.3V
     ocf_cnt_ch00: u16,
     // VD1_0, 5V
@@ -456,10 +697,10 @@ pub struct OverCurrentFaultState {
 impl From<Vec<u8>> for OverCurrentFaultState {
     fn from(v: Vec<u8>) -> OverCurrentFaultState {
         OverCurrentFaultState{
-            stat_ch_on: <u16>::from_le_bytes([v[6],v[7]]),
-            stat_ch_ext_on: <u16>::from_le_bytes([v[8],v[9]]),
-            stat_ch_ocf: <u16>::from_le_bytes([v[10],v[11]]),
-            stat_ch_ext_ocf: <u16>::from_le_bytes([v[12],v[13]]),
+            stat_ch_on: BusChannelState::from(<u16>::from_le_bytes([v[6],v[7]])),
+            stat_ch_ext_on: BusChannelState::from(<u16>::from_le_bytes([v[8],v[9]])),
+            stat_ch_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[10],v[11]])),
+            stat_ch_ext_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[12],v[13]])),
             ocf_cnt_ch00: <u16>::from_le_bytes([v[14],v[15]]),
             ocf_cnt_ch01: <u16>::from_le_bytes([v[16],v[17]]),
             ocf_cnt_ch02: <u16>::from_le_bytes([v[18],v[19]]),
@@ -480,24 +721,24 @@ impl From<Vec<u8>> for OverCurrentFaultState {
         }
     }
 }
-// PBU ABF Placed State (0x44)
-#[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
-pub struct ABFState {
-    // One reseved byte. Starting from the 6th byte
-    // 0xAB = ABF is placed, 0x00 = ABF is not placed
-    pub abf_placed_0: u8,
-    // 0xAB = ABF is placed, 0x00 = ABF is not placed
-    pub abf_placed_1: u8,
-}
+// // PBU ABF Placed State (0x44)
+// #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
+// pub struct ABFState {
+//     // One reseved byte. Starting from the 6th byte
+//     // 0xAB = ABF is placed, 0x00 = ABF is not placed
+//     pub abf_placed_0: u8,
+//     // 0xAB = ABF is placed, 0x00 = ABF is not placed
+//     pub abf_placed_1: u8,
+// }
 
-impl From<Vec<u8>> for ABFState {
-    fn from(v: Vec<u8>) -> ABFState {
-        ABFState{
-            abf_placed_0: v[6],
-            abf_placed_1: v[7],
-        }
-    }
-}
+// impl From<Vec<u8>> for ABFState {
+//     fn from(v: Vec<u8>) -> ABFState {
+//         ABFState{
+//             abf_placed_0: v[6],
+//             abf_placed_1: v[7],
+//         }
+//     }
+// }
 
 // PDU Housekeeping Engineering/Average Data (0x52 and 0x54)
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
@@ -510,13 +751,13 @@ pub struct PDUHk {
     // Input V, I and P data for the unit.
     vip_input: VIPData,
     // Bitflag field indicating channel-on status for output 0 through 15.
-    stat_ch_on:u16,
+    stat_ch_on: BusChannelState,
     // Bitflag field indicating channel-on status for output 16 through 31.
-    stat_ch_ext_on:u16,
+    stat_ch_ext_on: BusChannelState,
     // Bitflag field indicating overcurrent latch-off fault for output 0 through 15.
-    stat_ch_ocf:u16,
+    stat_ch_ocf: ChannelOverCurrentState,
     // Bitflag field indicating overcurrent latch-off fault for output 16 through 31.
-    stat_ch_ext_ocf:u16,
+    stat_ch_ext_ocf: ChannelOverCurrentState,
     // VIPData Output V, I and P of voltage domain 0 - 6
     vip_vd0:VIPData,
     vip_vd1:VIPData,
@@ -558,8 +799,42 @@ pub struct PDUHk {
     vip_cnt_ch14: VIPData,
     // VD4_1, 12V (customized)
     vip_cnt_ch15: VIPData,
-    // VD5_0, 28.2V 
-    vip_cnt_ch16: VIPData,
+}
+impl From<Vec<u8>> for PDUHk {
+    fn from(v: Vec<u8>) -> PDUHk {
+        PDUHk {
+            volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
+            temp: <i16>::from_le_bytes([v[2],v[3]]),
+            vip_input: VIPData::from(v[4..10].to_vec()),
+            stat_ch_on: BusChannelState::from(<u16>::from_le_bytes([v[10],v[11]])),
+            stat_ch_ext_on: BusChannelState::from(<u16>::from_le_bytes([v[12],v[13]])),
+            stat_ch_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[14],v[15]])),
+            stat_ch_ext_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[16],v[17]])),
+            vip_vd0: VIPData::from(v[18..24].to_vec()),
+            vip_vd1: VIPData::from(v[24..30].to_vec()),
+            vip_vd2: VIPData::from(v[30..36].to_vec()),
+            vip_vd3: VIPData::from(v[36..42].to_vec()),
+            vip_vd4: VIPData::from(v[42..48].to_vec()),
+            vip_vd5: VIPData::from(v[48..54].to_vec()),
+            vip_vd6: VIPData::from(v[54..60].to_vec()),
+            vip_cnt_ch00: VIPData::from(v[60..66].to_vec()),
+            vip_cnt_ch01: VIPData::from(v[66..72].to_vec()),
+            vip_cnt_ch02: VIPData::from(v[72..78].to_vec()),
+            vip_cnt_ch03: VIPData::from(v[78..84].to_vec()),
+            vip_cnt_ch04: VIPData::from(v[84..90].to_vec()),
+            vip_cnt_ch05: VIPData::from(v[90..96].to_vec()),
+            vip_cnt_ch06: VIPData::from(v[96..102].to_vec()),
+            vip_cnt_ch07: VIPData::from(v[102..108].to_vec()),
+            vip_cnt_ch08: VIPData::from(v[108..114].to_vec()),
+            vip_cnt_ch09: VIPData::from(v[114..120].to_vec()),
+            vip_cnt_ch10: VIPData::from(v[120..126].to_vec()),
+            vip_cnt_ch11: VIPData::from(v[126..132].to_vec()),
+            vip_cnt_ch12: VIPData::from(v[132..138].to_vec()),
+            vip_cnt_ch13: VIPData::from(v[138..144].to_vec()),
+            vip_cnt_ch14: VIPData::from(v[144..150].to_vec()),
+            vip_cnt_ch15: VIPData::from(v[150..156].to_vec()),
+        }
+    }
 }
 
 // PBU Housekeeping Engineering/Average Data (0x62 and 0x64)
@@ -572,11 +847,11 @@ pub struct PBUHk {
     pub temp: i16,
     pub vip_input: VIPData,
     // Bitflag field showing any raised flags on any battery chain
-    pub stat_bu: u16,
+    pub stat_bu: BattPackStatus,
     // Battery pack channel information.
     pub bp1: BattPackData,
-    pub bp2: BattPackData,
-    pub bp3: BattPackData,
+    // pub bp2: BattPackData,
+    // pub bp3: BattPackData,
 }
 impl From<Vec<u8>> for PBUHk {
     fn from(v: Vec<u8>) -> PBUHk {
@@ -584,10 +859,10 @@ impl From<Vec<u8>> for PBUHk {
             volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
             temp: <i16>::from_le_bytes([v[2],v[3]]),
             vip_input: VIPData::from(v[4..10].to_vec()),
-            stat_bu: <u16>::from_le_bytes([v[10],v[11]]),
+            stat_bu: BattPackStatus::from([v[10],v[11]].to_vec()),
             bp1: BattPackData::from(v[12..34].to_vec()),
-            bp2: BattPackData::from(v[34..56].to_vec()),
-            bp3: BattPackData::from(v[56..78].to_vec()),
+            // bp2: BattPackData::from(v[34..56].to_vec()),
+            // bp3: BattPackData::from(v[56..78].to_vec()),
         }
     }
 }
@@ -607,6 +882,19 @@ pub struct PCUHk {
     pub ccd2: CondChnData,
     pub ccd3: CondChnData,
     pub ccd4: CondChnData,
+}
+impl From<Vec<u8>> for PCUHk {
+    fn from(v: Vec<u8>) -> PCUHk {
+        PCUHk {
+            volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
+            temp: <i16>::from_le_bytes([v[2],v[3]]),
+            vip_output: VIPData::from(v[4..10].to_vec()),
+            ccd1: CondChnData::from(v[10..22].to_vec()),
+            ccd2: CondChnData::from(v[22..34].to_vec()),
+            ccd3: CondChnData::from(v[34..46].to_vec()),
+            ccd4: CondChnData::from(v[46..58].to_vec()),
+        }
+    }
 }
 
 // PIU Housekeeping Engineering/Average Data (0xA2 and 0xA4)
