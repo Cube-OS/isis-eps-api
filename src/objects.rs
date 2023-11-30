@@ -651,9 +651,9 @@ pub struct OverCurrentFaultState {
     // One reseved byte. Starting from the 6th byte
     // Length of useful data for ICEPSv2 (17 channels), 50bytes
     // Bitflag field indicating channel-on status. 1 means corresponding output bus is enabled
-    stat_ch_on: BusChannelState,
+    pub stat_ch_on: BusChannelState,
     // Bitflag field indicating channel-on fault status
-    stat_ch_ext_on: BusChannelState,
+    pub stat_ch_ext_on: BusChannelState,
     // Bitflag field indicating overcurrent status. 1 means corresponding output bus is latched off
     stat_ch_ocf: ChannelOverCurrentState,
     // Bitflag field indicating overcurrent fault status 
