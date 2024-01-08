@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 serde = "1.0"
-bincode = "1.0"
 failure = "0.1.2"
 # cubeos-service = { git = "ssh://git@github.com/Cube-OS/cubeos-service.git"}
 cubeos-service = { path = "../../cubeos-service" }

@@ -44,7 +44,7 @@ pub enum StID {
 }
 
 // Output Bus Group 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum BusGroup {
     #[default]
     BusGroupOn,
@@ -195,6 +195,40 @@ impl BusChannelState {
             _ => return Err(EpsError::InvalidBusChannelState),
         }
         Ok(u)
+    }
+
+    fn set_channel(typ_group: BusGroup) -> BusChannel {
+        match typ_group {
+            BusGroup::BusGroupOn => BusChannel::On,
+            BusGroup::BusGroupOff => BusChannel::Off,
+            _ => BusChannel::Keep,
+        }
+    }
+
+    pub fn set(typ_group: BusGroup, channels: Vec<u8>) -> EpsResult<Self> {
+        let mut bus_channel_state = BusChannelState::default();
+        for c in channels.iter() {
+            match c {
+                0 => bus_channel_state.ch00 = Self::set_channel(typ_group),
+                1 => bus_channel_state.ch01 = Self::set_channel(typ_group),
+                2 => bus_channel_state.ch02 = Self::set_channel(typ_group),
+                3 => bus_channel_state.ch03 = Self::set_channel(typ_group),
+                4 => bus_channel_state.ch04 = Self::set_channel(typ_group),
+                5 => bus_channel_state.ch05 = Self::set_channel(typ_group),
+                6 => bus_channel_state.ch06 = Self::set_channel(typ_group),
+                7 => bus_channel_state.ch07 = Self::set_channel(typ_group),
+                8 => bus_channel_state.ch08 = Self::set_channel(typ_group),
+                9 => bus_channel_state.ch09 = Self::set_channel(typ_group),
+                10 => bus_channel_state.ch10 = Self::set_channel(typ_group),
+                11 => bus_channel_state.ch11 = Self::set_channel(typ_group),
+                12 => bus_channel_state.ch12 = Self::set_channel(typ_group),
+                13 => bus_channel_state.ch13 = Self::set_channel(typ_group),
+                14 => bus_channel_state.ch14 = Self::set_channel(typ_group),
+                15 => bus_channel_state.ch15 = Self::set_channel(typ_group),
+                _ => return Err(EpsError::InvalidBusChannelState),
+            }
+        }
+        Ok(bus_channel_state)
     }
 }
 impl From<u16> for BusChannelState {

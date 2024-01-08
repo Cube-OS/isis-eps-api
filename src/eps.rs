@@ -161,7 +161,7 @@ impl Eps {
 
     // Turn-on/off output bus channels with bitflag, leave unmarked unaltered. （0x10,0x12,0x14）
     // LSB bit corresponds to bus channel 0 (CH0),
-    pub fn set_group_outputs(&self, typ_group: BusGroup, channels: BusChannelState) -> EpsResult<()> {
+    pub fn set_group_outputs(&self, typ_group: BusGroup, channels: Vec<u8>) -> EpsResult<()> {
         // Match correct command arg
         let cmd_code: u8 = match typ_group {
             BusGroup::BusGroupOn => OUTPUT_BUS_GROUP_ON,
@@ -170,10 +170,11 @@ impl Eps {
         };
 
         let cmd: u8 = PIU_STID;
+        let bus_channels = BusChannelState::set(typ_group, channels)?;
         let group_bytes = match typ_group {
-            BusGroup::BusGroupOn => channels.on().to_le_bytes(),
-            BusGroup::BusGroupOff => channels.off().to_le_bytes(),
-            BusGroup::BusGroupState => match channels.state() {
+            BusGroup::BusGroupOn => bus_channels.on().to_le_bytes(),
+            BusGroup::BusGroupOff => bus_channels.off().to_le_bytes(),
+            BusGroup::BusGroupState => match bus_channels.state() {
                 Ok(x) => x.to_le_bytes(),
                 Err(e) => return Err(e),
             }
