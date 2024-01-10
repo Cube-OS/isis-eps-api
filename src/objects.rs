@@ -112,87 +112,87 @@ impl BusChannelState {
         if self.ch15.is_off() {u |= 0x8000;}
         u
     }
-    pub fn state(&self) -> EpsResult<u16> {
-        let mut u = 0u16;
+    pub fn state(&self, mut u: u16) -> EpsResult<u16> {
+        // let mut u = 0u16;
         match self.ch00 {
             BusChannel::On => u |= 0x0001,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0001,
+            BusChannel::Keep => (),
         }
         match self.ch01 {
             BusChannel::On => u |= 0x0002,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0002,
+            BusChannel::Keep => (),
         }
         match self.ch02 {
             BusChannel::On => u |= 0x0004,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0004,
+            BusChannel::Keep => (),
         }
         match self.ch03 {
             BusChannel::On => u |= 0x0008,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0008,
+            BusChannel::Keep => (),
         }
         match self.ch04 {
             BusChannel::On => u |= 0x0010,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0010,
+            BusChannel::Keep => (),
         }
         match self.ch05 {
             BusChannel::On => u |= 0x0020,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0020,
+            BusChannel::Keep => (),
         }
         match self.ch06 {
             BusChannel::On => u |= 0x0040,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0040,
+            BusChannel::Keep => (),
         }
         match self.ch07 {
             BusChannel::On => u |= 0x0080,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0080,
+            BusChannel::Keep => (),
         }
         match self.ch08 {
             BusChannel::On => u |= 0x0100,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0100,
+            BusChannel::Keep => (),
         }
         match self.ch09 {
             BusChannel::On => u |= 0x0200,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0200,
+            BusChannel::Keep => (),
         }
         match self.ch10 {
             BusChannel::On => u |= 0x0400,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0400,
+            BusChannel::Keep => (),
         }
         match self.ch11 {
             BusChannel::On => u |= 0x0800,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x0800,
+            BusChannel::Keep => (),
         }
         match self.ch12 {
             BusChannel::On => u |= 0x1000,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x1000,
+            BusChannel::Keep => (),
         }
         match self.ch13 {
             BusChannel::On => u |= 0x2000,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x2000,
+            BusChannel::Keep => (),
         }
         match self.ch14 {
             BusChannel::On => u |= 0x4000,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x4000,
+            BusChannel::Keep => (),
         }
         match self.ch15 {
             BusChannel::On => u |= 0x8000,
-            BusChannel::Off => u |= 0x0000,
-            _ => return Err(EpsError::InvalidBusChannelState),
+            BusChannel::Off => u &= !0x8000,
+            BusChannel::Keep => (),
         }
         Ok(u)
     }

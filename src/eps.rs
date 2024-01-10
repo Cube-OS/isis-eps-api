@@ -159,9 +159,7 @@ impl Eps {
         }
     }
 
-    // Turn-on/off output bus channels with bitflag, leave unmarked unaltered. （0x10,0x12,0x14）
-    // LSB bit corresponds to bus channel 0 (CH0),
-    pub fn set_group_outputs(&self, typ_group: BusGroup, channels: Vec<u8>) -> EpsResult<()> {
+    fn set_group(&self, typ_group: BusGroup, channels: BusChannelState) -> EpsResult<()> {
         // Match correct command arg
         let cmd_code: u8 = match typ_group {
             BusGroup::BusGroupOn => OUTPUT_BUS_GROUP_ON,
@@ -170,13 +168,18 @@ impl Eps {
         };
 
         let cmd: u8 = PIU_STID;
-        let bus_channels = BusChannelState::set(typ_group, channels)?;
         let group_bytes = match typ_group {
-            BusGroup::BusGroupOn => bus_channels.on().to_le_bytes(),
-            BusGroup::BusGroupOff => bus_channels.off().to_le_bytes(),
-            BusGroup::BusGroupState => match bus_channels.state() {
-                Ok(x) => x.to_le_bytes(),
-                Err(e) => return Err(e),
+            BusGroup::BusGroupOn => channels.on().to_le_bytes(),
+            BusGroup::BusGroupOff => channels.off().to_le_bytes(),
+            BusGroup::BusGroupState => {
+                let mut current_state = match self.piu_hk(PIUHkSel::PIUEngHK) {
+                    Ok(x) => x.stat_ch_on,
+                    Err(e) => return Err(e),
+                };
+                match channels.state(current_state) {
+                    Ok(x) => x.to_le_bytes(),
+                    Err(e) => return Err(e),
+                }
             }
         }; // use little endian for ISIS{
 
@@ -190,17 +193,29 @@ impl Eps {
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
-        println!{"Set GroupOutput Cmd {:?}",command};
+        println!{"Set Group Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             // The (5th byte) responsed need to be parsed with match_stat
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"Set GroupOutput Response {:?}",x};
+                println!{"Set Group Response {:?}",x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
         }
+    }
+
+    // Turn-on/off output bus channels with bitflag, leave unmarked unaltered. （0x10,0x12,0x14）
+    // LSB bit corresponds to bus channel 0 (CH0),
+    pub fn set_group_outputs(&self, typ_group: BusGroup, channels: Vec<u8>) -> EpsResult<()> {
+        let bus_channels = BusChannelState::set(typ_group, channels)?;
+        
+        self.set_group(typ_group, bus_channels)
+    }
+
+    pub fn set_group_state(&self, typ_group: BusGroup, channels: BusChannelState) -> EpsResult<()> {       
+        self.set_group(typ_group, channels)
     }
 
     // Turn a single output bus channel on using the bus channel index. (0x16,0x18)
