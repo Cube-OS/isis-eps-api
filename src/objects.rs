@@ -27,8 +27,6 @@
 use serde::*;
 use crate::error::*;
 use strum_macros::{EnumString,Display,EnumIter};
-use strum::IntoEnumIterator;
-use std::str::FromStr;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum StID {
@@ -254,13 +252,6 @@ impl From<u16> for BusChannelState {
         }
     }
 }
-impl FromStr for BusChannelState {
-    type Err = std::num::ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(serde_json::from_str(s).map_err(|_| u8::from_str("256").unwrap_err())?)
-    }
-}
 
 // Output Bus Channel
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
@@ -380,16 +371,6 @@ pub struct VIPRawData {
     curr_raw: i16,
     pwr_raw: i16,
 }
-
-// impl From<Vec<u8>> for VIPRawData {
-//     fn from(v: Vec<u8>) -> VIPRawData {
-//         VIPRawData{
-//             volt_raw: <i16>::from_le_bytes([v[0],v[1]]),
-//             curr_raw: <i16>::from_le_bytes([v[2],v[3]]),
-//             pwr_raw: <i16>::from_le_bytes([v[4],v[5]]),
-//         }
-//     }
-// }
 
 // The voltage V - current I - power P datatype (VIPD) data. 
 // Used in blocks across the HK telemetry.

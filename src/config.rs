@@ -1,14 +1,13 @@
 use crate::error::*;
-use crate::objects::*;
+
 use crate::eps::*;
 use crate::ConfigParamRead::*;
 use crate::ConfigParamWrite::*;
 use crate::*;
 use std::time::Duration;
-use i2c_rs::{Command, Connection as I2c};
+use i2c_rs::{Command};
 use serde::*;
 use strum_macros::{EnumString,Display,EnumIter};
-use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
 pub enum Output {

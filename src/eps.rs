@@ -25,12 +25,12 @@
 use i2c_rs::{Command, Connection as I2c};
 
 use std::time::Duration;
-use crate::objects::*;
+
 use crate::error::*;
 use crate::*;
 use std::convert::From;
-use cubeos_service::Error;
-use std::mem::*;
+
+
 
 // // StID match shortcut
 // fn match_st_id(typ: StID) -> u8 {
@@ -172,7 +172,7 @@ impl Eps {
             BusGroup::BusGroupOn => channels.on().to_le_bytes(),
             BusGroup::BusGroupOff => channels.off().to_le_bytes(),
             BusGroup::BusGroupState => {
-                let mut current_state = match self.piu_hk(PIUHkSel::PIUEngHK) {
+                let current_state = match self.piu_hk(PIUHkSel::PIUEngHK) {
                     Ok(x) => x.stat_ch_on,
                     Err(e) => return Err(e),
                 };
@@ -495,7 +495,7 @@ impl Eps {
     // unix time value is returned as part of the “0x40 (0x41) – Get System Status” response, 
     pub fn correct_time(&self, time_correction: i32) -> EpsResult<()> {
         
-        let cmd_code: u8 = CORRECT_TIME;
+        let _cmd_code: u8 = CORRECT_TIME;
         let cmd: u8 = PIU_STID;
         
         let mut data: Vec<u8> = [ALL_IVID, 0xC4, OVERRIDE_BID].to_vec();

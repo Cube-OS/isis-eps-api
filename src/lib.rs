@@ -11,11 +11,11 @@ mod error;
 mod config;
 
 // ID's
-const PDU_STID: u8 = 0x11;
-const PBU_STID: u8 = 0x12;
-const PCU_STID: u8 = 0x13;
+// const PDU_STID: u8 = 0x11;
+// const PBU_STID: u8 = 0x12;
+// const PCU_STID: u8 = 0x13;
 const PIU_STID: u8 = 0x1A;
-const OVERRIDE_STID: u8 = 0x00;
+// const OVERRIDE_STID: u8 = 0x00;
 const ALL_IVID: u8 = 0x07;
 // const OVERRIDE_IVID: u8 = 0x00;
 // const PDU_BID: u8 = 0x00;
@@ -46,7 +46,7 @@ const SWITCH_TO_SAFETY_MODE: u8 = 0x32;
 // Data request commands
 const GET_SYS_STATUS: u8 = 0x40;
 const GET_PDU_OC_FAULT_STATE: u8 = 0x42;
-const GET_PBU_ABF_PLACED_STATE: u8 = 0x44;
+// const GET_PBU_ABF_PLACED_STATE: u8 = 0x44;
 const GET_PDU_HK_DATA_RAW: u8 = 0x50;
 const GET_PDU_HK_DATA_ENG: u8 = 0x52;
 const GET_PDU_HK_DATA_AVRG: u8 = 0x54;
