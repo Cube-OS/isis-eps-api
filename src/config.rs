@@ -4,10 +4,10 @@ use crate::eps::*;
 use crate::ConfigParamRead::*;
 use crate::ConfigParamWrite::*;
 use crate::*;
-use std::time::Duration;
-use i2c_rs::{Command};
+use i2c_rs::Command;
 use serde::*;
-use strum_macros::{EnumString,Display,EnumIter};
+use std::time::Duration;
+use strum_macros::{Display, EnumIter, EnumString};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
 pub enum Output {
@@ -18,7 +18,19 @@ pub enum Output {
     I8(i8),
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum ConfigParamWriteU32 {
     #[default]
     ChStartupEnaBf,
@@ -27,7 +39,19 @@ pub enum ConfigParamWriteU32 {
     ChLatchoffKey,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum ConfigParamWriteU16 {
     #[default]
     TtcWdgTimeout,
@@ -38,7 +62,19 @@ pub enum ConfigParamWriteU16 {
     SafetyVoltHiThr,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum ConfigParamWriteI16 {
     #[default]
     LoThrBp1Heater,
@@ -59,7 +95,19 @@ pub enum ConfigParamWriteI16 {
     Bp1Temp3PosDiv,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum ConfigParamWriteU8 {
     #[default]
     BoardId,
@@ -67,7 +115,19 @@ pub enum ConfigParamWriteU8 {
     RavgStrengthP2,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum ConfigParamWriteI8 {
     #[default]
     AutoHeatEnaBP1,
@@ -86,7 +146,19 @@ pub enum ConfigParamWriteI8 {
     Vd6AlwaysDisa,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum ConfigParamWrite {
     ChStartupEnaBf,
     ChStartupKey,
@@ -244,7 +316,7 @@ impl ConfigParamWrite {
             HiThrBp1Unbal => 0x3009,
             McuTempBias => 0x300C,
             McuTempPremul => 0x300D,
-            McuTempPosDiv => 0x300E,       
+            McuTempPosDiv => 0x300E,
             Bp1Temp1Bias => 0x300F,
             Bp1Temp2Bias => 0x3010,
             Bp1Temp3Bias => 0x3011,
@@ -414,8 +486,20 @@ impl From<ConfigParamWriteI8> for ConfigParamWrite {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
-pub enum ConfigParamRead {    
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
+pub enum ConfigParamRead {
     ChForceEnaUseBf,
     ChStartUpEnaUseBf,
     ChLatchoffEnaUseBf,
@@ -516,27 +600,26 @@ pub trait EpsConfig {
     fn set_config_para_u8(&self, param: ConfigParamWriteU8, input: u8) -> EpsResult<Output>;
     fn set_config_para_i8(&self, param: ConfigParamWriteI8, input: i8) -> EpsResult<Output>;
     fn reset_param(&self, param: ConfigParamWrite) -> EpsResult<Output>;
-    fn reset_all_conf(&self) -> EpsResult<()>;    
+    fn reset_all_conf(&self) -> EpsResult<()>;
     fn load_config(&self) -> EpsResult<()>;
     fn save_config_force(&self) -> EpsResult<()>;
     fn save_config(&self) -> EpsResult<()>;
     fn calculate_checksum(&self) -> EpsResult<u16>;
     fn get_config_data(&self) -> EpsResult<Vec<u8>>;
 }
-impl EpsConfig for Eps {   
-    fn get_config_para_write(&self, param: ConfigParamWrite) -> EpsResult<Output> 
-    {
+impl EpsConfig for Eps {
+    fn get_config_para_write(&self, param: ConfigParamWrite) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-    
+
         let id = param.get_id().to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-    
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};        
+        println! {"System Config Cmd{:?}",command};
 
         match param.get_id() {
             0x6000..=0x60FF => {
@@ -544,88 +627,89 @@ impl EpsConfig for Eps {
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::U32(u32::from_le_bytes([x[8],x[9],x[10],x[11]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => {
+                                Ok(Output::U32(u32::from_le_bytes([x[8], x[9], x[10], x[11]])))
+                            }
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x4000..=0x40FF => {
                 let rx_len = 10;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8],x[9]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8], x[9]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x3000..=0x30FF => {
                 let rx_len = 10;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8],x[9]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8], x[9]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x2000..=0x20FF => {
                 let rx_len = 8;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
                             Ok(()) => Ok(Output::U8(u8::from_le_bytes([x[8]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x1000..=0x10FF => {
                 let rx_len = 8;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
                             Ok(()) => Ok(Output::I8(i8::from_le_bytes([x[8]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             _ => Err(EpsError::InvalidInput),
-        }   
+        }
     }
 
-    fn get_config_para_read(&self, param: ConfigParamRead) -> EpsResult<Output> 
-    {
+    fn get_config_para_read(&self, param: ConfigParamRead) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-    
+
         let id = param.get_id().to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, GET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-    
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
+        println! {"System Config Cmd{:?}",command};
 
         match param.get_id() {
             0x6800..=0x68FF => {
@@ -633,211 +717,213 @@ impl EpsConfig for Eps {
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::U32(u32::from_le_bytes([x[8],x[9],x[10],x[11]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => {
+                                Ok(Output::U32(u32::from_le_bytes([x[8], x[9], x[10], x[11]])))
+                            }
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x4800..=0x48FF => {
                 let rx_len = 10;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8],x[9]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8], x[9]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x3800..=0x38FF => {
                 let rx_len = 10;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8],x[9]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8], x[9]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x2800..=0x28FF => {
                 let rx_len = 8;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
                             Ok(()) => Ok(Output::U8(u8::from_le_bytes([x[8]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x1800..=0x18FF => {
                 let rx_len = 8;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
                             Ok(()) => Ok(Output::I8(i8::from_le_bytes([x[8]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             _ => Err(EpsError::InvalidInput),
-        }   
+        }
     }
 
     fn set_config_para_u32(&self, param: ConfigParamWriteU32, input: u32) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-    
+
         let id = ConfigParamWrite::from(param).get_id().to_le_bytes();
         let mut data: Vec<u8> = [ALL_IVID, SET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-        
+
         data.append(&mut input.to_le_bytes().to_vec());
-            
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
+        println! {"System Config Cmd{:?}",command};
         let rx_len = 12;
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"System Config Response {:?}",x};
-                match match_stat(x[4]){
-                    Ok(()) => Ok(Output::U32(u32::from_le_bytes([x[8],x[9],x[10],x[11]]))),
+                println! {"System Config Response {:?}",x};
+                match match_stat(x[4]) {
+                    Ok(()) => Ok(Output::U32(u32::from_le_bytes([x[8], x[9], x[10], x[11]]))),
                     Err(e) => Err(e),
-                }                 
-            }            
+                }
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     fn set_config_para_u16(&self, param: ConfigParamWriteU16, input: u16) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-        
+
         let id = ConfigParamWrite::from(param).get_id().to_le_bytes();
         let mut data: Vec<u8> = [ALL_IVID, SET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-        
+
         data.append(&mut input.to_le_bytes().to_vec());
-            
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
+        println! {"System Config Cmd{:?}",command};
         let rx_len = 10;
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"System Config Response {:?}",x};
-                match match_stat(x[4]){
-                    Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8],x[9]]))),
+                println! {"System Config Response {:?}",x};
+                match match_stat(x[4]) {
+                    Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8], x[9]]))),
                     Err(e) => Err(e),
-                }                 
-            }            
+                }
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     fn set_config_para_i16(&self, param: ConfigParamWriteI16, input: i16) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-    
+
         let id = ConfigParamWrite::from(param).get_id().to_le_bytes();
         let mut data: Vec<u8> = [ALL_IVID, SET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-        
+
         data.append(&mut input.to_le_bytes().to_vec());
-            
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
+        println! {"System Config Cmd{:?}",command};
         let rx_len = 10;
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"System Config Response {:?}",x};
-                match match_stat(x[4]){
-                    Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8],x[9]]))),
+                println! {"System Config Response {:?}",x};
+                match match_stat(x[4]) {
+                    Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8], x[9]]))),
                     Err(e) => Err(e),
-                }                 
-            }            
+                }
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     fn set_config_para_u8(&self, param: ConfigParamWriteU8, input: u8) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-    
+
         let id = ConfigParamWrite::from(param).get_id().to_le_bytes();
         let mut data: Vec<u8> = [ALL_IVID, SET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-        
+
         data.append(&mut input.to_le_bytes().to_vec());
-            
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
+        println! {"System Config Cmd{:?}",command};
         let rx_len = 9;
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"System Config Response {:?}",x};
-                match match_stat(x[4]){
+                println! {"System Config Response {:?}",x};
+                match match_stat(x[4]) {
                     Ok(()) => Ok(Output::U8(u8::from_le_bytes([x[8]]))),
                     Err(e) => Err(e),
-                }                 
-            }            
+                }
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
 
     fn set_config_para_i8(&self, param: ConfigParamWriteI8, input: i8) -> EpsResult<Output> {
         let cmd: u8 = PIU_STID;
-    
+
         let id = ConfigParamWrite::from(param).get_id().to_le_bytes();
         let mut data: Vec<u8> = [ALL_IVID, SET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
-        
+
         data.append(&mut input.to_le_bytes().to_vec());
-            
-        let command = Command{cmd,data};        
-        
+
+        let command = Command { cmd, data };
+
         let delay = Duration::from_millis(50);
-    
+
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
+        println! {"System Config Cmd{:?}",command};
         let rx_len = 9;
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"System Config Response {:?}",x};
-                match match_stat(x[4]){
+                println! {"System Config Response {:?}",x};
+                match match_stat(x[4]) {
                     Ok(()) => Ok(Output::I8(i8::from_le_bytes([x[8]]))),
                     Err(e) => Err(e),
-                }                 
-            }            
+                }
+            }
             Err(_e) => Err(EpsError::TransferError),
         }
     }
@@ -848,87 +934,88 @@ impl EpsConfig for Eps {
         let id = param.get_id().to_le_bytes();
         let data: Vec<u8> = [ALL_IVID, RESET_CONFIG_PARA, OVERRIDE_BID, id[0], id[1]].to_vec();
 
-        let command = Command{cmd,data};
+        let command = Command { cmd, data };
 
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
-        println!{"System Config Cmd{:?}",command};
-        
+        println! {"System Config Cmd{:?}",command};
+
         match param.get_id() {
             0x6000..=0x60FF => {
                 let rx_len = 12;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::U32(u32::from_le_bytes([x[8],x[9],x[10],x[11]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => {
+                                Ok(Output::U32(u32::from_le_bytes([x[8], x[9], x[10], x[11]])))
+                            }
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x4000..=0x40FF => {
                 let rx_len = 10;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8],x[9]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => Ok(Output::U16(u16::from_le_bytes([x[8], x[9]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x3000..=0x30FF => {
                 let rx_len = 10;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
-                            Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8],x[9]]))),
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
+                            Ok(()) => Ok(Output::I16(i16::from_le_bytes([x[8], x[9]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x2000..=0x20FF => {
                 let rx_len = 8;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
                             Ok(()) => Ok(Output::U8(u8::from_le_bytes([x[8]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             0x1000..=0x10FF => {
                 let rx_len = 8;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
-                        println!{"System Config Response {:?}",x};
-                        match match_stat(x[4]){
+                        println! {"System Config Response {:?}",x};
+                        match match_stat(x[4]) {
                             Ok(()) => Ok(Output::I8(i8::from_le_bytes([x[8]]))),
                             Err(e) => Err(e),
-                        }                 
-                    }            
+                        }
+                    }
                     Err(_e) => Err(EpsError::TransferError),
-                }    
+                }
             }
             _ => Err(EpsError::InvalidInput),
-        }  
-
+        }
     }
 
     fn reset_all_conf(&self) -> EpsResult<()> {
@@ -937,20 +1024,20 @@ impl EpsConfig for Eps {
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
-        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key].to_vec();
-        let command = Command{cmd, data};
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key].to_vec();
+        let command = Command { cmd, data };
 
         // Send command
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
-        println!{"Reset All Config Cmd {:?}",command};
+        println! {"Reset All Config Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"Reset All Config Response {:?}", x};
+                println! {"Reset All Config Response {:?}", x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
@@ -963,20 +1050,20 @@ impl EpsConfig for Eps {
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
-        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key].to_vec();
-        let command = Command{cmd, data};
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key].to_vec();
+        let command = Command { cmd, data };
 
         // Send command
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
-        println!{"Load Config Cmd {:?}",command};
+        println! {"Load Config Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"Load Config Response {:?}", x};
+                println! {"Load Config Response {:?}", x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
@@ -990,20 +1077,20 @@ impl EpsConfig for Eps {
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
-        let data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key, checksum].to_vec();
-        let command = Command{cmd, data};
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key, checksum].to_vec();
+        let command = Command { cmd, data };
 
         // Send command
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
-        println!{"Save Config Cmd {:?}",command};
+        println! {"Save Config Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"Save Config Response {:?}", x};
+                println! {"Save Config Response {:?}", x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
@@ -1020,21 +1107,21 @@ impl EpsConfig for Eps {
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
-        let mut data:Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key].to_vec();
+        let mut data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key].to_vec();
         data.append(&mut checksum.to_vec());
-        let command = Command{cmd, data};
+        let command = Command { cmd, data };
 
         // Send command
         let rx_len = 5;
         let delay = Duration::from_millis(50);
 
         #[cfg(feature = "debug")]
-        println!{"Save Config Cmd {:?}",command};
+        println! {"Save Config Cmd {:?}",command};
 
         match self.i2c.transfer(command, rx_len, delay) {
             Ok(x) => {
                 #[cfg(feature = "debug")]
-                println!{"Save Config Response {:?}", x};
+                println! {"Save Config Response {:?}", x};
                 match_stat(x[4])
             }
             Err(_e) => Err(EpsError::TransferError),
@@ -1067,10 +1154,11 @@ impl EpsConfig for Eps {
         let mut result: Vec<u8> = Vec::new();
 
         for param in ConfigParamWrite::iter_id() {
-            let param_data = match self.get_config_para_write(ConfigParamWrite::from_id(param).unwrap()) {
-                Ok(x) => x,
-                Err(e) => return Err(e),
-            };
+            let param_data =
+                match self.get_config_para_write(ConfigParamWrite::from_id(param).unwrap()) {
+                    Ok(x) => x,
+                    Err(e) => return Err(e),
+                };
             match param_data {
                 Output::U32(x) => result.append(&mut x.to_le_bytes().to_vec()),
                 Output::U16(x) => result.append(&mut x.to_le_bytes().to_vec()),

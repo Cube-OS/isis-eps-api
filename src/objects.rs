@@ -16,7 +16,7 @@
 //! CubeOS API for interacting with [ISIS ICEPSv2]
 // Reference documentation: ISIS Electrical Power System 2 –Software ICD – IVID 7
 
-// The API is contributed by Xueliang Bai <x.bai@sydney.edu.au> 
+// The API is contributed by Xueliang Bai <x.bai@sydney.edu.au>
 // and Oscar Wilfred Thomas Ansted <oans4023@uni.sydney.edu.au> on behalf of the
 // ARC Training Centre for CubeSats, UAVs & Their Applications (CUAVA) team (www.cuava.com.au)
 // at the University of Sydney
@@ -24,9 +24,9 @@
 // Input enumerations
 // System Type Identifier (STID)
 
-use serde::*;
 use crate::error::*;
-use strum_macros::{EnumString,Display,EnumIter};
+use serde::*;
+use strum_macros::{Display, EnumIter, EnumString};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum StID {
@@ -42,8 +42,20 @@ pub enum StID {
     OverrideStid,
 }
 
-// Output Bus Group 
-#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display)]
+// Output Bus Group
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+)]
 pub enum BusGroup {
     #[default]
     BusGroupOn,
@@ -73,42 +85,106 @@ pub struct BusChannelState {
 impl BusChannelState {
     pub fn on(&self) -> u16 {
         let mut u = 0u16;
-        if self.ch00.is_on() {u |= 0x0001;}
-        if self.ch01.is_on() {u |= 0x0002;}
-        if self.ch02.is_on() {u |= 0x0004;}
-        if self.ch03.is_on() {u |= 0x0008;}
-        if self.ch04.is_on() {u |= 0x0010;}
-        if self.ch05.is_on() {u |= 0x0020;}
-        if self.ch06.is_on() {u |= 0x0040;}
-        if self.ch07.is_on() {u |= 0x0080;}
-        if self.ch08.is_on() {u |= 0x0100;}
-        if self.ch09.is_on() {u |= 0x0200;}
-        if self.ch10.is_on() {u |= 0x0400;}
-        if self.ch11.is_on() {u |= 0x0800;}
-        if self.ch12.is_on() {u |= 0x1000;}
-        if self.ch13.is_on() {u |= 0x2000;}
-        if self.ch14.is_on() {u |= 0x4000;}
-        if self.ch15.is_on() {u |= 0x8000;}
+        if self.ch00.is_on() {
+            u |= 0x0001;
+        }
+        if self.ch01.is_on() {
+            u |= 0x0002;
+        }
+        if self.ch02.is_on() {
+            u |= 0x0004;
+        }
+        if self.ch03.is_on() {
+            u |= 0x0008;
+        }
+        if self.ch04.is_on() {
+            u |= 0x0010;
+        }
+        if self.ch05.is_on() {
+            u |= 0x0020;
+        }
+        if self.ch06.is_on() {
+            u |= 0x0040;
+        }
+        if self.ch07.is_on() {
+            u |= 0x0080;
+        }
+        if self.ch08.is_on() {
+            u |= 0x0100;
+        }
+        if self.ch09.is_on() {
+            u |= 0x0200;
+        }
+        if self.ch10.is_on() {
+            u |= 0x0400;
+        }
+        if self.ch11.is_on() {
+            u |= 0x0800;
+        }
+        if self.ch12.is_on() {
+            u |= 0x1000;
+        }
+        if self.ch13.is_on() {
+            u |= 0x2000;
+        }
+        if self.ch14.is_on() {
+            u |= 0x4000;
+        }
+        if self.ch15.is_on() {
+            u |= 0x8000;
+        }
         u
     }
     pub fn off(&self) -> u16 {
         let mut u = 0u16;
-        if self.ch00.is_off() {u |= 0x0001;}
-        if self.ch01.is_off() {u |= 0x0002;}
-        if self.ch02.is_off() {u |= 0x0004;}
-        if self.ch03.is_off() {u |= 0x0008;}
-        if self.ch04.is_off() {u |= 0x0010;}
-        if self.ch05.is_off() {u |= 0x0020;}
-        if self.ch06.is_off() {u |= 0x0040;}
-        if self.ch07.is_off() {u |= 0x0080;}
-        if self.ch08.is_off() {u |= 0x0100;}
-        if self.ch09.is_off() {u |= 0x0200;}
-        if self.ch10.is_off() {u |= 0x0400;}
-        if self.ch11.is_off() {u |= 0x0800;}
-        if self.ch12.is_off() {u |= 0x1000;}
-        if self.ch13.is_off() {u |= 0x2000;}
-        if self.ch14.is_off() {u |= 0x4000;}
-        if self.ch15.is_off() {u |= 0x8000;}
+        if self.ch00.is_off() {
+            u |= 0x0001;
+        }
+        if self.ch01.is_off() {
+            u |= 0x0002;
+        }
+        if self.ch02.is_off() {
+            u |= 0x0004;
+        }
+        if self.ch03.is_off() {
+            u |= 0x0008;
+        }
+        if self.ch04.is_off() {
+            u |= 0x0010;
+        }
+        if self.ch05.is_off() {
+            u |= 0x0020;
+        }
+        if self.ch06.is_off() {
+            u |= 0x0040;
+        }
+        if self.ch07.is_off() {
+            u |= 0x0080;
+        }
+        if self.ch08.is_off() {
+            u |= 0x0100;
+        }
+        if self.ch09.is_off() {
+            u |= 0x0200;
+        }
+        if self.ch10.is_off() {
+            u |= 0x0400;
+        }
+        if self.ch11.is_off() {
+            u |= 0x0800;
+        }
+        if self.ch12.is_off() {
+            u |= 0x1000;
+        }
+        if self.ch13.is_off() {
+            u |= 0x2000;
+        }
+        if self.ch14.is_off() {
+            u |= 0x4000;
+        }
+        if self.ch15.is_off() {
+            u |= 0x8000;
+        }
         u
     }
     pub fn state(&self, mut u: u16) -> EpsResult<u16> {
@@ -233,33 +309,109 @@ impl BusChannelState {
 impl From<u16> for BusChannelState {
     fn from(u: u16) -> BusChannelState {
         BusChannelState {
-            ch00: if (u & 0x0001)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch01: if (u & 0x0002)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch02: if (u & 0x0004)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch03: if (u & 0x0008)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch04: if (u & 0x0010)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch05: if (u & 0x0020)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch06: if (u & 0x0040)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch07: if (u & 0x0080)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch08: if (u & 0x0100)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch09: if (u & 0x0200)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch10: if (u & 0x0400)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch11: if (u & 0x0800)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch12: if (u & 0x1000)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch13: if (u & 0x2000)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch14: if (u & 0x4000)!=0 {BusChannel::On} else {BusChannel::Off},
-            ch15: if (u & 0x8000)!=0 {BusChannel::On} else {BusChannel::Off},
+            ch00: if (u & 0x0001) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch01: if (u & 0x0002) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch02: if (u & 0x0004) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch03: if (u & 0x0008) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch04: if (u & 0x0010) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch05: if (u & 0x0020) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch06: if (u & 0x0040) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch07: if (u & 0x0080) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch08: if (u & 0x0100) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch09: if (u & 0x0200) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch10: if (u & 0x0400) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch11: if (u & 0x0800) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch12: if (u & 0x1000) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch13: if (u & 0x2000) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch14: if (u & 0x4000) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
+            ch15: if (u & 0x8000) != 0 {
+                BusChannel::On
+            } else {
+                BusChannel::Off
+            },
         }
     }
 }
 
 // Output Bus Channel
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    EnumIter,
+    EnumString,
+    Display,
+    Hash,
+)]
 pub enum BusChannel {
     #[default]
     Keep,
     On,
-    Off,    
+    Off,
 }
 impl BusChannel {
     pub fn is_on(&self) -> bool {
@@ -277,7 +429,9 @@ impl BusChannel {
 }
 
 // Used in ModeSwitch (0x30/0x31)
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, EnumString)]
+#[derive(
+    Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, EnumString,
+)]
 pub enum ModeSwitch {
     #[default]
     Nominal,
@@ -330,7 +484,6 @@ impl TryFrom<u8> for ResetCause {
     }
 }
 
-
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum PDUHkSel {
     PDURawHK,
@@ -355,15 +508,17 @@ pub enum PCUHkSel {
     PCUAvgHK,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display)]
+#[derive(
+    Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display,
+)]
 pub enum PIUHkSel {
     PIURawHK,
     #[default]
     PIUEngHK,
-    PIUAvgHK, 
+    PIUAvgHK,
 }
- 
-// The voltage V - current I - power P datatype (VIPD) raw data. 
+
+// The voltage V - current I - power P datatype (VIPD) raw data.
 // Used in blocks across the HK telemetry.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct VIPRawData {
@@ -372,7 +527,7 @@ pub struct VIPRawData {
     pwr_raw: i16,
 }
 
-// The voltage V - current I - power P datatype (VIPD) data. 
+// The voltage V - current I - power P datatype (VIPD) data.
 // Used in blocks across the HK telemetry.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct VIPData {
@@ -383,18 +538,18 @@ pub struct VIPData {
 
 impl From<Vec<u8>> for VIPData {
     fn from(v: Vec<u8>) -> VIPData {
-        VIPData{
-            volt: <i16>::from_le_bytes([v[0],v[1]]),
-            curr: <i16>::from_le_bytes([v[2],v[3]]),
-            pwr: 10*(<i16>::from_le_bytes([v[4],v[5]])),
+        VIPData {
+            volt: <i16>::from_le_bytes([v[0], v[1]]),
+            curr: <i16>::from_le_bytes([v[2], v[3]]),
+            pwr: 10 * (<i16>::from_le_bytes([v[4], v[5]])),
         }
     }
 }
 
-// The battery pack raw data (BPD). 
+// The battery pack raw data (BPD).
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
-pub struct BattPackRawData{
+pub struct BattPackRawData {
     vip_bp_output_raw: VIPRawData,
     stat_bp_raw: u16,
     volt_cell1_raw: u16,
@@ -421,26 +576,26 @@ pub struct BattPackStatus {
     batt3_balancing: bool,
     batt4_balancing: bool,
     heater: bool,
-    enabled: bool, 
+    enabled: bool,
 }
 impl From<Vec<u8>> for BattPackStatus {
     fn from(v: Vec<u8>) -> BattPackStatus {
-        let b = <u16>::from_le_bytes([v[0],v[1]]);
+        let b = <u16>::from_le_bytes([v[0], v[1]]);
         BattPackStatus {
-            batt1_under: (b & 0x0001)!=0,
-            batt2_under: (b & 0x0002)!=0,
-            batt3_under: (b & 0x0004)!=0,
-            batt4_under: (b & 0x0008)!=0,
-            batt1_over: (b & 0x0010)!=0,
-            batt2_over: (b & 0x0020)!=0,
-            batt3_over: (b & 0x0040)!=0,
-            batt4_over: (b & 0x0080)!=0,
-            batt1_balancing: (b & 0x0100)!=0,
-            batt2_balancing: (b & 0x0200)!=0,
-            batt3_balancing: (b & 0x0400)!=0,
-            batt4_balancing: (b & 0x0800)!=0,
-            heater: (b & 0x1000)!=0,
-            enabled: (b & 0x8000)!=0,
+            batt1_under: (b & 0x0001) != 0,
+            batt2_under: (b & 0x0002) != 0,
+            batt3_under: (b & 0x0004) != 0,
+            batt4_under: (b & 0x0008) != 0,
+            batt1_over: (b & 0x0010) != 0,
+            batt2_over: (b & 0x0020) != 0,
+            batt3_over: (b & 0x0040) != 0,
+            batt4_over: (b & 0x0080) != 0,
+            batt1_balancing: (b & 0x0100) != 0,
+            batt2_balancing: (b & 0x0200) != 0,
+            batt3_balancing: (b & 0x0400) != 0,
+            batt4_balancing: (b & 0x0800) != 0,
+            heater: (b & 0x1000) != 0,
+            enabled: (b & 0x8000) != 0,
         }
     }
 }
@@ -460,10 +615,10 @@ impl From<Vec<u8>> for BattPackStatus {
 //     SWCI_CH_CMD_DISA_BF = u32
 //     }
 
-// The battery pack data (BPD). 
+// The battery pack data (BPD).
 // Used in the PBU HK telemetry
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
-pub struct BattPackData{
+pub struct BattPackData {
     pub vip_bp_output: VIPData,
     pub stat_bp: u16,
     pub volt_cell1: i16,
@@ -477,21 +632,21 @@ pub struct BattPackData{
 
 impl From<Vec<u8>> for BattPackData {
     fn from(v: Vec<u8>) -> BattPackData {
-        BattPackData{
+        BattPackData {
             vip_bp_output: VIPData::from(v[0..6].to_vec()),
-            stat_bp: <u16>::from_le_bytes([v[6],v[7]]),
-            volt_cell1: <i16>::from_le_bytes([v[8],v[9]]),
-            volt_cell2: <i16>::from_le_bytes([v[10],v[11]]),
-            volt_cell3: <i16>::from_le_bytes([v[12],v[13]]),
-            volt_cell4: <i16>::from_le_bytes([v[14],v[15]]),
-            bat_temp1: <i16>::from_le_bytes([v[16],v[17]]),
-            bat_temp2: <i16>::from_le_bytes([v[18],v[19]]),
-            bat_temp3: <i16>::from_le_bytes([v[20],v[21]]),
+            stat_bp: <u16>::from_le_bytes([v[6], v[7]]),
+            volt_cell1: <i16>::from_le_bytes([v[8], v[9]]),
+            volt_cell2: <i16>::from_le_bytes([v[10], v[11]]),
+            volt_cell3: <i16>::from_le_bytes([v[12], v[13]]),
+            volt_cell4: <i16>::from_le_bytes([v[14], v[15]]),
+            bat_temp1: <i16>::from_le_bytes([v[16], v[17]]),
+            bat_temp2: <i16>::from_le_bytes([v[18], v[19]]),
+            bat_temp3: <i16>::from_le_bytes([v[20], v[21]]),
         }
     }
 }
 
-//CCD Raw data, the conditioning channel datatype (CCD) for each power conditioning chain  
+//CCD Raw data, the conditioning channel datatype (CCD) for each power conditioning chain
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct CondChnRawData {
     vip_cc_output_raw: VIPData,
@@ -501,7 +656,7 @@ pub struct CondChnRawData {
     curr_out_mppt_raw: u16,
 }
 
-//CCD data, the conditioning channel datatype for each power conditioning chain  
+//CCD data, the conditioning channel datatype for each power conditioning chain
 #[derive(Clone, Debug, Default, Serialize, Deserialize, Hash)]
 pub struct CondChnData {
     vip_cc_output: VIPData,
@@ -513,12 +668,12 @@ pub struct CondChnData {
 
 impl From<Vec<u8>> for CondChnData {
     fn from(v: Vec<u8>) -> CondChnData {
-        CondChnData{
+        CondChnData {
             vip_cc_output: VIPData::from(v[0..6].to_vec()),
-            volt_in_mppt: <i16>::from_le_bytes([v[6],v[7]]),
-            curr_in_mppt: <i16>::from_le_bytes([v[8],v[9]]),
-            volt_out_mppt: <i16>::from_le_bytes([v[10],v[11]]),
-            curr_out_mppt: <i16>::from_le_bytes([v[12],v[13]]),
+            volt_in_mppt: <i16>::from_le_bytes([v[6], v[7]]),
+            curr_in_mppt: <i16>::from_le_bytes([v[8], v[9]]),
+            volt_out_mppt: <i16>::from_le_bytes([v[10], v[11]]),
+            curr_out_mppt: <i16>::from_le_bytes([v[12], v[13]]),
         }
     }
 }
@@ -543,17 +698,17 @@ pub struct CondChnShortData {
 
 impl From<Vec<u8>> for CondChnShortData {
     fn from(v: Vec<u8>) -> CondChnShortData {
-        CondChnShortData{
-            volt_in_mppt: <i16>::from_le_bytes([v[0],v[1]]),
-            curr_in_mppt: <i16>::from_le_bytes([v[2],v[3]]),
-            volt_out_mppt: <i16>::from_le_bytes([v[4],v[5]]),
-            curr_out_mppt: <i16>::from_le_bytes([v[6],v[7]]),
+        CondChnShortData {
+            volt_in_mppt: <i16>::from_le_bytes([v[0], v[1]]),
+            curr_in_mppt: <i16>::from_le_bytes([v[2], v[3]]),
+            volt_out_mppt: <i16>::from_le_bytes([v[4], v[5]]),
+            curr_out_mppt: <i16>::from_le_bytes([v[6], v[7]]),
         }
     }
 }
 
 /* ----------------------------------------------------------------
-Query response, STID, IVID, RC, BID and STAT are ignored in the structure. 
+Query response, STID, IVID, RC, BID and STAT are ignored in the structure.
 Structure takes the 5th offset byte (0 to 4 are fixed) as the first byte of the structure.
 */
 
@@ -589,7 +744,7 @@ pub struct SystemStatus {
     // Calendar month of UNIX_TIME
     unix_month: u8,
     // Calendar day of UNIX_TIME
-    unix_day: u8, 
+    unix_day: u8,
     // Calendar hour of UNIX_TIME
     unix_hour: u8,
     // Calendar minute of UNIX_minute
@@ -603,22 +758,22 @@ impl TryFrom<Vec<u8>> for SystemStatus {
     fn try_from(v: Vec<u8>) -> EpsResult<SystemStatus> {
         let mode = EpsMode::try_from(v[5])?;
         let reset_cause = ResetCause::try_from(v[7])?;
-        Ok(SystemStatus{
+        Ok(SystemStatus {
             mode,
             conf: v[6] & 0x01 != 0,
             reset_cause,
-            uptime: <u32>::from_le_bytes([v[8],v[9],v[10],v[11]]),
-            error: <u16>::from_le_bytes([v[12],v[13]]),
-            rc_cnt_pwron: <u16>::from_le_bytes([v[14],v[15]]),
-            rc_cnt_wdg: <u16>::from_le_bytes([v[16],v[17]]),
-            rc_cnt_cmd: <u16>::from_le_bytes([v[18],v[19]]),
-            rc_cnt_mcu: <u16>::from_le_bytes([v[20],v[21]]),
-            rc_cnt_lowpwr: <u16>::from_le_bytes([v[22],v[23]]),
-            prevcmd_elapsed: <u16>::from_le_bytes([v[24],v[25]]),
-            unix_time: <u32>::from_le_bytes([v[26],v[27],v[28],v[29]]),
+            uptime: <u32>::from_le_bytes([v[8], v[9], v[10], v[11]]),
+            error: <u16>::from_le_bytes([v[12], v[13]]),
+            rc_cnt_pwron: <u16>::from_le_bytes([v[14], v[15]]),
+            rc_cnt_wdg: <u16>::from_le_bytes([v[16], v[17]]),
+            rc_cnt_cmd: <u16>::from_le_bytes([v[18], v[19]]),
+            rc_cnt_mcu: <u16>::from_le_bytes([v[20], v[21]]),
+            rc_cnt_lowpwr: <u16>::from_le_bytes([v[22], v[23]]),
+            prevcmd_elapsed: <u16>::from_le_bytes([v[24], v[25]]),
+            unix_time: <u32>::from_le_bytes([v[26], v[27], v[28], v[29]]),
             unix_year: v[30],
             unix_month: v[31],
-            unix_day: v[32], 
+            unix_day: v[32],
             unix_hour: v[33],
             unix_minute: v[34],
             unix_second: v[35],
@@ -647,23 +802,23 @@ pub struct ChannelOverCurrentState {
 }
 impl From<u16> for ChannelOverCurrentState {
     fn from(u: u16) -> ChannelOverCurrentState {
-        ChannelOverCurrentState{
-            ch00: (u & 0x0001)!=0,
-            ch01: (u & 0x0002)!=0,
-            ch02: (u & 0x0004)!=0,
-            ch03: (u & 0x0008)!=0,
-            ch04: (u & 0x0010)!=0,
-            ch05: (u & 0x0020)!=0,
-            ch06: (u & 0x0040)!=0,
-            ch07: (u & 0x0080)!=0,
-            ch08: (u & 0x0100)!=0,
-            ch09: (u & 0x0200)!=0,
-            ch10: (u & 0x0400)!=0,
-            ch11: (u & 0x0800)!=0,
-            ch12: (u & 0x1000)!=0,
-            ch13: (u & 0x2000)!=0,
-            ch14: (u & 0x4000)!=0,
-            ch15: (u & 0x8000)!=0,
+        ChannelOverCurrentState {
+            ch00: (u & 0x0001) != 0,
+            ch01: (u & 0x0002) != 0,
+            ch02: (u & 0x0004) != 0,
+            ch03: (u & 0x0008) != 0,
+            ch04: (u & 0x0010) != 0,
+            ch05: (u & 0x0020) != 0,
+            ch06: (u & 0x0040) != 0,
+            ch07: (u & 0x0080) != 0,
+            ch08: (u & 0x0100) != 0,
+            ch09: (u & 0x0200) != 0,
+            ch10: (u & 0x0400) != 0,
+            ch11: (u & 0x0800) != 0,
+            ch12: (u & 0x1000) != 0,
+            ch13: (u & 0x2000) != 0,
+            ch14: (u & 0x4000) != 0,
+            ch15: (u & 0x8000) != 0,
         }
     }
 }
@@ -679,7 +834,7 @@ pub struct OverCurrentFaultState {
     pub stat_ch_ext_on: BusChannelState,
     // Bitflag field indicating overcurrent status. 1 means corresponding output bus is latched off
     stat_ch_ocf: ChannelOverCurrentState,
-    // Bitflag field indicating overcurrent fault status 
+    // Bitflag field indicating overcurrent fault status
     stat_ch_ext_ocf: ChannelOverCurrentState,
     // VD0_0, 3.3V
     ocf_cnt_ch00: u16,
@@ -699,11 +854,11 @@ pub struct OverCurrentFaultState {
     ocf_cnt_ch07: u16,
     // VD2_3, 3.3V
     ocf_cnt_ch08: u16,
-    // VD0_1, 3.3V 
+    // VD0_1, 3.3V
     ocf_cnt_ch09: u16, //CubeADCS 3-Axi
-    // VD0_2, 3.3V    
+    // VD0_2, 3.3V
     ocf_cnt_ch10: u16,
-    // VD0_3, 3.3V    
+    // VD0_3, 3.3V
     ocf_cnt_ch11: u16,
     // VD3_0, 5.4V (customized)
     ocf_cnt_ch12: u16,
@@ -713,34 +868,34 @@ pub struct OverCurrentFaultState {
     ocf_cnt_ch14: u16,
     // VD4_1, 12V (customized)
     ocf_cnt_ch15: u16,
-    // VD5_0, 28.2V 
+    // VD5_0, 28.2V
     ocf_cnt_ch16: u16,
 }
 
 impl From<Vec<u8>> for OverCurrentFaultState {
     fn from(v: Vec<u8>) -> OverCurrentFaultState {
-        OverCurrentFaultState{
-            stat_ch_on: BusChannelState::from(<u16>::from_le_bytes([v[6],v[7]])),
-            stat_ch_ext_on: BusChannelState::from(<u16>::from_le_bytes([v[8],v[9]])),
-            stat_ch_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[10],v[11]])),
-            stat_ch_ext_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[12],v[13]])),
-            ocf_cnt_ch00: <u16>::from_le_bytes([v[14],v[15]]),
-            ocf_cnt_ch01: <u16>::from_le_bytes([v[16],v[17]]),
-            ocf_cnt_ch02: <u16>::from_le_bytes([v[18],v[19]]),
-            ocf_cnt_ch03: <u16>::from_le_bytes([v[20],v[21]]),
-            ocf_cnt_ch04: <u16>::from_le_bytes([v[22],v[23]]),
-            ocf_cnt_ch05: <u16>::from_le_bytes([v[24],v[25]]),
-            ocf_cnt_ch06: <u16>::from_le_bytes([v[26],v[27]]),
-            ocf_cnt_ch07: <u16>::from_le_bytes([v[28],v[29]]),
-            ocf_cnt_ch08: <u16>::from_le_bytes([v[30],v[31]]),
-            ocf_cnt_ch09: <u16>::from_le_bytes([v[32],v[33]]),
-            ocf_cnt_ch10: <u16>::from_le_bytes([v[34],v[35]]),
-            ocf_cnt_ch11: <u16>::from_le_bytes([v[36],v[37]]),
-            ocf_cnt_ch12: <u16>::from_le_bytes([v[38],v[39]]),
-            ocf_cnt_ch13: <u16>::from_le_bytes([v[40],v[41]]),
-            ocf_cnt_ch14: <u16>::from_le_bytes([v[42],v[43]]),
-            ocf_cnt_ch15: <u16>::from_le_bytes([v[44],v[45]]),
-            ocf_cnt_ch16: <u16>::from_le_bytes([v[46],v[47]]),
+        OverCurrentFaultState {
+            stat_ch_on: BusChannelState::from(<u16>::from_le_bytes([v[6], v[7]])),
+            stat_ch_ext_on: BusChannelState::from(<u16>::from_le_bytes([v[8], v[9]])),
+            stat_ch_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[10], v[11]])),
+            stat_ch_ext_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[12], v[13]])),
+            ocf_cnt_ch00: <u16>::from_le_bytes([v[14], v[15]]),
+            ocf_cnt_ch01: <u16>::from_le_bytes([v[16], v[17]]),
+            ocf_cnt_ch02: <u16>::from_le_bytes([v[18], v[19]]),
+            ocf_cnt_ch03: <u16>::from_le_bytes([v[20], v[21]]),
+            ocf_cnt_ch04: <u16>::from_le_bytes([v[22], v[23]]),
+            ocf_cnt_ch05: <u16>::from_le_bytes([v[24], v[25]]),
+            ocf_cnt_ch06: <u16>::from_le_bytes([v[26], v[27]]),
+            ocf_cnt_ch07: <u16>::from_le_bytes([v[28], v[29]]),
+            ocf_cnt_ch08: <u16>::from_le_bytes([v[30], v[31]]),
+            ocf_cnt_ch09: <u16>::from_le_bytes([v[32], v[33]]),
+            ocf_cnt_ch10: <u16>::from_le_bytes([v[34], v[35]]),
+            ocf_cnt_ch11: <u16>::from_le_bytes([v[36], v[37]]),
+            ocf_cnt_ch12: <u16>::from_le_bytes([v[38], v[39]]),
+            ocf_cnt_ch13: <u16>::from_le_bytes([v[40], v[41]]),
+            ocf_cnt_ch14: <u16>::from_le_bytes([v[42], v[43]]),
+            ocf_cnt_ch15: <u16>::from_le_bytes([v[44], v[45]]),
+            ocf_cnt_ch16: <u16>::from_le_bytes([v[46], v[47]]),
         }
     }
 }
@@ -782,13 +937,13 @@ pub struct PDUHk {
     // Bitflag field indicating overcurrent latch-off fault for output 16 through 31.
     stat_ch_ext_ocf: ChannelOverCurrentState,
     // VIPData Output V, I and P of voltage domain 0 - 6
-    vip_vd0:VIPData,
-    vip_vd1:VIPData,
-    vip_vd2:VIPData,
-    vip_vd3:VIPData,
-    vip_vd4:VIPData,
-    vip_vd5:VIPData,
-    vip_vd6:VIPData,
+    vip_vd0: VIPData,
+    vip_vd1: VIPData,
+    vip_vd2: VIPData,
+    vip_vd3: VIPData,
+    vip_vd4: VIPData,
+    vip_vd5: VIPData,
+    vip_vd6: VIPData,
     // VIPData output for channel 0 - 16
     // VD0_0, 3.3V
     vip_cnt_ch00: VIPData,
@@ -808,11 +963,11 @@ pub struct PDUHk {
     vip_cnt_ch07: VIPData,
     // VD2_3, 3.3V
     vip_cnt_ch08: VIPData,
-    // VD0_1, 3.3V 
+    // VD0_1, 3.3V
     vip_cnt_ch09: VIPData,
-    // VD0_2, 3.3V    
+    // VD0_2, 3.3V
     vip_cnt_ch10: VIPData,
-    // VD0_3, 3.3V    
+    // VD0_3, 3.3V
     vip_cnt_ch11: VIPData,
     // VD3_0, 5.4V (customized)
     vip_cnt_ch12: VIPData,
@@ -826,13 +981,13 @@ pub struct PDUHk {
 impl From<Vec<u8>> for PDUHk {
     fn from(v: Vec<u8>) -> PDUHk {
         PDUHk {
-            volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
-            temp: <i16>::from_le_bytes([v[2],v[3]]),
+            volt_brdsup: <i16>::from_le_bytes([v[0], v[1]]),
+            temp: <i16>::from_le_bytes([v[2], v[3]]),
             vip_input: VIPData::from(v[4..10].to_vec()),
-            stat_ch_on: BusChannelState::from(<u16>::from_le_bytes([v[10],v[11]])),
-            stat_ch_ext_on: BusChannelState::from(<u16>::from_le_bytes([v[12],v[13]])),
-            stat_ch_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[14],v[15]])),
-            stat_ch_ext_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[16],v[17]])),
+            stat_ch_on: BusChannelState::from(<u16>::from_le_bytes([v[10], v[11]])),
+            stat_ch_ext_on: BusChannelState::from(<u16>::from_le_bytes([v[12], v[13]])),
+            stat_ch_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[14], v[15]])),
+            stat_ch_ext_ocf: ChannelOverCurrentState::from(<u16>::from_le_bytes([v[16], v[17]])),
             vip_vd0: VIPData::from(v[18..24].to_vec()),
             vip_vd1: VIPData::from(v[24..30].to_vec()),
             vip_vd2: VIPData::from(v[30..36].to_vec()),
@@ -866,7 +1021,7 @@ pub struct PBUHk {
     // One reseved byte. Starting from the 6th byte
     // Voltage of internal board supply.
     pub volt_brdsup: i16,
-    // °C Measured temperature 
+    // °C Measured temperature
     pub temp: i16,
     pub vip_input: VIPData,
     // Bitflag field showing any raised flags on any battery chain
@@ -879,10 +1034,10 @@ pub struct PBUHk {
 impl From<Vec<u8>> for PBUHk {
     fn from(v: Vec<u8>) -> PBUHk {
         PBUHk {
-            volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
-            temp: <i16>::from_le_bytes([v[2],v[3]]),
+            volt_brdsup: <i16>::from_le_bytes([v[0], v[1]]),
+            temp: <i16>::from_le_bytes([v[2], v[3]]),
             vip_input: VIPData::from(v[4..10].to_vec()),
-            stat_bu: BattPackStatus::from([v[10],v[11]].to_vec()),
+            stat_bu: BattPackStatus::from([v[10], v[11]].to_vec()),
             bp1: BattPackData::from(v[12..34].to_vec()),
             // bp2: BattPackData::from(v[34..56].to_vec()),
             // bp3: BattPackData::from(v[56..78].to_vec()),
@@ -909,8 +1064,8 @@ pub struct PCUHk {
 impl From<Vec<u8>> for PCUHk {
     fn from(v: Vec<u8>) -> PCUHk {
         PCUHk {
-            volt_brdsup: <i16>::from_le_bytes([v[0],v[1]]),
-            temp: <i16>::from_le_bytes([v[2],v[3]]),
+            volt_brdsup: <i16>::from_le_bytes([v[0], v[1]]),
+            temp: <i16>::from_le_bytes([v[2], v[3]]),
             vip_output: VIPData::from(v[4..10].to_vec()),
             ccd1: CondChnData::from(v[10..22].to_vec()),
             ccd2: CondChnData::from(v[22..34].to_vec()),
@@ -930,22 +1085,22 @@ pub struct PIUHk {
     pub temp: i16,
     // Input V, I and P input of the distribution part of the unit in raw form.
     pub vip_dist_input: VIPData,
-    // Input V, I and P input of the battery part of the unit 
+    // Input V, I and P input of the battery part of the unit
     pub vip_batt_input: VIPData,
     // Bitflag field indicating channel-on status for output 0 through 15.
-    pub stat_ch_on:u16,
+    pub stat_ch_on: u16,
     // Bitflag field indicating overcurrent latch-off fault for output 0 through 15.
-    pub stat_ch_ocf:u16,
+    pub stat_ch_ocf: u16,
     // Bitflag field indicating BP board status.
-    pub batt_stat:u16,
+    pub batt_stat: u16,
     // 2 and 4 cell battery pack
-    pub batt_temp2:i16,
+    pub batt_temp2: i16,
     // 2 cell battery pack not used, temp for 4 cell battery pack:
-    pub batt_temp3:i16,
+    pub batt_temp3: i16,
     // Voltage level for domain 0 - 2
-    pub volt_vd0:i16,
-    pub volt_vd1:i16,
-    pub volt_vd2:i16,
+    pub volt_vd0: i16,
+    pub volt_vd1: i16,
+    pub volt_vd2: i16,
     // VIPData output for channel 0 - 16
     // VD0_0, 3.3V
     pub vip_cnt_ch00: VIPData,
@@ -969,11 +1124,11 @@ pub struct PIUHk {
     pub ccd1: CondChnShortData,
     pub ccd2: CondChnShortData,
     pub ccd3: CondChnShortData,
-    // VD0_1, 3.3V 
+    // VD0_1, 3.3V
     pub vip_cnt_ch09: VIPData,
-    // VD0_2, 3.3V    
+    // VD0_2, 3.3V
     pub vip_cnt_ch10: VIPData,
-    // VD0_3, 3.3V    
+    // VD0_3, 3.3V
     pub vip_cnt_ch11: VIPData,
     // VD3_0, 5.4V (customized)
     pub vip_cnt_ch12: VIPData,
@@ -983,7 +1138,7 @@ pub struct PIUHk {
     pub vip_cnt_ch14: VIPData,
     // VD4_1, 12V (customized)
     pub vip_cnt_ch15: VIPData,
-    // Data on conditioning chain 
+    // Data on conditioning chain
     pub ccd4: CondChnShortData,
     pub ccd5: CondChnShortData,
     // Bitflag field indicating channel-on status for the extended output bus channels
@@ -997,19 +1152,19 @@ pub struct PIUHk {
 
 impl From<Vec<u8>> for PIUHk {
     fn from(v: Vec<u8>) -> PIUHk {
-        PIUHk{
-            volt_brdsup: <i16>::from_le_bytes([v[6],v[7]]),
-            temp: <i16>::from_le_bytes([v[8],v[9]]),
+        PIUHk {
+            volt_brdsup: <i16>::from_le_bytes([v[6], v[7]]),
+            temp: <i16>::from_le_bytes([v[8], v[9]]),
             vip_dist_input: VIPData::from(v[10..16].to_vec()),
             vip_batt_input: VIPData::from(v[16..22].to_vec()),
-            stat_ch_on: <u16>::from_le_bytes([v[22],v[23]]), 
-            stat_ch_ocf: <u16>::from_le_bytes([v[24],v[25]]),
-            batt_stat: <u16>::from_le_bytes([v[26],v[27]]),
-            batt_temp2:<i16>::from_le_bytes([v[28],v[29]]),
-            batt_temp3:<i16>::from_le_bytes([v[30],v[31]]),
-            volt_vd0:<i16>::from_le_bytes([v[32],v[33]]),
-            volt_vd1:<i16>::from_le_bytes([v[34],v[35]]),
-            volt_vd2:<i16>::from_le_bytes([v[36],v[37]]),
+            stat_ch_on: <u16>::from_le_bytes([v[22], v[23]]),
+            stat_ch_ocf: <u16>::from_le_bytes([v[24], v[25]]),
+            batt_stat: <u16>::from_le_bytes([v[26], v[27]]),
+            batt_temp2: <i16>::from_le_bytes([v[28], v[29]]),
+            batt_temp3: <i16>::from_le_bytes([v[30], v[31]]),
+            volt_vd0: <i16>::from_le_bytes([v[32], v[33]]),
+            volt_vd1: <i16>::from_le_bytes([v[34], v[35]]),
+            volt_vd2: <i16>::from_le_bytes([v[36], v[37]]),
             vip_cnt_ch00: VIPData::from(v[38..44].to_vec()),
             vip_cnt_ch01: VIPData::from(v[44..50].to_vec()),
             vip_cnt_ch02: VIPData::from(v[50..56].to_vec()),
@@ -1031,8 +1186,8 @@ impl From<Vec<u8>> for PIUHk {
             vip_cnt_ch15: VIPData::from(v[152..158].to_vec()),
             ccd4: CondChnShortData::from(v[158..166].to_vec()),
             ccd5: CondChnShortData::from(v[166..174].to_vec()),
-            stat_ch_ext_on: <u16>::from_le_bytes([v[174],v[175]]),
-            stat_ch_ext_ocf: <u16>::from_le_bytes([v[176],v[177]]),
+            stat_ch_ext_on: <u16>::from_le_bytes([v[174], v[175]]),
+            stat_ch_ext_ocf: <u16>::from_le_bytes([v[176], v[177]]),
             vip_cnt_ch16: VIPData::from(v[178..184].to_vec()),
         }
     }

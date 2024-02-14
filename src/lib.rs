@@ -1,14 +1,14 @@
 // #![deny(missing_docs)]
 
-pub use crate::eps::*;
-pub use crate::objects::*;
-pub use crate::error::*;
 pub use crate::config::*;
+pub use crate::eps::*;
+pub use crate::error::*;
+pub use crate::objects::*;
 
-mod eps;
-mod objects;
-mod error;
 mod config;
+mod eps;
+mod error;
+mod objects;
 
 // ID's
 // const PDU_STID: u8 = 0x11;
@@ -23,7 +23,7 @@ const ALL_IVID: u8 = 0x07;
 // const PCU_BID: u8 = 0x00;
 const OVERRIDE_BID: u8 = 0x00;
 
-// System Operational command 
+// System Operational command
 const SYS_RESET: u8 = 0xAA;
 const NO_OP: u8 = 0x02;
 const CANCEL_OP: u8 = 0x04;
@@ -39,7 +39,7 @@ const OUTPUT_BUS_GROUP_STATE: u8 = 0x14;
 const OUTPUT_BUS_CHANNEL_ON: u8 = 0x16;
 const OUTPUT_BUS_CHANNEL_OFF: u8 = 0x18;
 
-// Mode switch command 
+// Mode switch command
 const SWITCH_TO_NOMINAL_MODE: u8 = 0x30;
 const SWITCH_TO_SAFETY_MODE: u8 = 0x32;
 
@@ -71,7 +71,8 @@ const GET_PIU_HK_DATA_ENG: u8 = 0xA2;
 const GET_PIU_HK_DATA_AVRG: u8 = 0xA4;
 
 // Most other functions return the STAT parameter. Write function here to check the the STAT for the error code
-fn match_stat(typ: u8) -> EpsResult<()> { // is it <T, Error> ?
+fn match_stat(typ: u8) -> EpsResult<()> {
+    // is it <T, Error> ?
     match typ {
         0x00 => Ok(()),
         0x80 => Ok(()),

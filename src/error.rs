@@ -43,7 +43,6 @@ pub enum EpsError {
     InvalidEpsMode,
     #[fail(display = "Invalid Bus Channel State")]
     InvalidBusChannelState,
-
 }
 
 /// All Errors in EpsError are converted to Error::ServiceError(u8)
@@ -107,7 +106,7 @@ impl From<Error> for EpsError {
 //             bincode::ErrorKind::DeserializeAnyNotSupported => EpsError::Bincode(5),
 //             bincode::ErrorKind::SizeLimit => EpsError::Bincode(6),
 //             bincode::ErrorKind::SequenceMustHaveLength => EpsError::Bincode(7),
-//             bincode::ErrorKind::Custom(_) => EpsError::Bincode(8),            
+//             bincode::ErrorKind::Custom(_) => EpsError::Bincode(8),
 //         }
 //     }
 // }
