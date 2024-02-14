@@ -28,6 +28,7 @@ use serde::*;
 use crate::error::*;
 use strum_macros::{EnumString,Display,EnumIter};
 use strum::IntoEnumIterator;
+use std::str::FromStr;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
 pub enum StID {
@@ -44,7 +45,7 @@ pub enum StID {
 }
 
 // Output Bus Group 
-#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display)]
 pub enum BusGroup {
     #[default]
     BusGroupOn,
@@ -253,9 +254,16 @@ impl From<u16> for BusChannelState {
         }
     }
 }
+impl FromStr for BusChannelState {
+    type Err = std::num::ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(serde_json::from_str(s).map_err(|_| u8::from_str("256").unwrap_err())?)
+    }
+}
 
 // Output Bus Channel
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum BusChannel {
     #[default]
     Keep,
@@ -278,7 +286,7 @@ impl BusChannel {
 }
 
 // Used in ModeSwitch (0x30/0x31)
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, EnumString)]
 pub enum ModeSwitch {
     #[default]
     Nominal,
@@ -356,7 +364,7 @@ pub enum PCUHkSel {
     PCUAvgHK,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display)]
 pub enum PIUHkSel {
     PIURawHK,
     #[default]

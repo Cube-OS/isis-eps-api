@@ -19,7 +19,7 @@ pub enum Output {
     I8(i8),
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamWriteU32 {
     #[default]
     ChStartupEnaBf,
@@ -28,7 +28,7 @@ pub enum ConfigParamWriteU32 {
     ChLatchoffKey,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamWriteU16 {
     #[default]
     TtcWdgTimeout,
@@ -39,7 +39,7 @@ pub enum ConfigParamWriteU16 {
     SafetyVoltHiThr,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamWriteI16 {
     #[default]
     LoThrBp1Heater,
@@ -60,7 +60,7 @@ pub enum ConfigParamWriteI16 {
     Bp1Temp3PosDiv,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamWriteU8 {
     #[default]
     BoardId,
@@ -68,7 +68,7 @@ pub enum ConfigParamWriteU8 {
     RavgStrengthP2,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamWriteI8 {
     #[default]
     AutoHeatEnaBP1,
@@ -87,7 +87,7 @@ pub enum ConfigParamWriteI8 {
     Vd6AlwaysDisa,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamWrite {
     ChStartupEnaBf,
     ChStartupKey,
@@ -415,7 +415,7 @@ impl From<ConfigParamWriteI8> for ConfigParamWrite {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, Display, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, EnumIter, EnumString, Display, Hash)]
 pub enum ConfigParamRead {    
     ChForceEnaUseBf,
     ChStartUpEnaUseBf,
