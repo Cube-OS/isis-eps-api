@@ -78,21 +78,47 @@ pub enum ConfigParamWriteU16 {
 pub enum ConfigParamWriteI16 {
     #[default]
     LoThrBp1Heater,
+    // LoThrBp2Heater,
+    // LoThrBp3Heater,
     HiThrBp1Heater,
+    // HiThrBp2Heater,
+    // HiThrBp3Heater,
     LoThrBp1Unbal,
+    // LoThrBp2Unbal,
+    // LoThrBp3Unbal,
     HiThrBp1Unbal,
+    // HiThrBp2Unbal,
+    // HiThrBp3Unbal,
     McuTempBias,
     McuTempPremul,
     McuTempPosDiv,
     Bp1Temp1Bias,
     Bp1Temp2Bias,
     Bp1Temp3Bias,
+    // Bp2Temp1Bias,
+    // Bp2Temp2Bias,
+    // Bp2Temp3Bias,
+    // Bp3Temp1Bias,
+    // Bp3Temp2Bias,
+    // Bp3Temp3Bias,
     Bp1Temp1Premul,
     Bp1Temp2Premul,
     Bp1Temp3Premul,
+    // Bp2Temp1Premul,
+    // Bp2Temp2Premul,
+    // Bp2Temp3Premul,
+    // Bp3Temp1Premul,
+    // Bp3Temp2Premul,
+    // Bp3Temp3Premul,
     Bp1Temp1PosDiv,
     Bp1Temp2PosDiv,
     Bp1Temp3PosDiv,
+    // Bp2Temp1PosDiv,
+    // Bp2Temp2PosDiv,
+    // Bp2Temp3PosDiv,
+    // Bp3Temp1PosDiv,
+    // Bp3Temp2PosDiv,
+    // Bp3Temp3PosDiv,
 }
 
 #[derive(
@@ -131,7 +157,11 @@ pub enum ConfigParamWriteU8 {
 pub enum ConfigParamWriteI8 {
     #[default]
     AutoHeatEnaBP1,
+    AutoHeatEnaBP2,
+    AutoHeatEnaBP3,
     AutoBalEnaBP1,
+    AutoBalEnaBP2,
+    AutoBalEnaBP3,
     Vd1AlwaysEna,
     Vd2AlwaysEna,
     Vd3AlwaysEna,
@@ -667,7 +697,7 @@ impl EpsConfig for Eps {
                 }
             }
             0x2000..=0x20FF => {
-                let rx_len = 8;
+                let rx_len = 9;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
@@ -681,7 +711,7 @@ impl EpsConfig for Eps {
                 }
             }
             0x1000..=0x10FF => {
-                let rx_len = 8;
+                let rx_len = 9;
                 match self.i2c.transfer(command, rx_len, delay) {
                     Ok(x) => {
                         #[cfg(feature = "debug")]
