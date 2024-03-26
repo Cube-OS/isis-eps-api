@@ -1103,7 +1103,7 @@ impl EpsConfig for Eps {
     fn save_config_force(&self) -> EpsResult<()> {
         let cmd_code: u8 = SAVE_CONFIG;
         let config_key: u8 = 0xA7;
-        let checksum: u16 = 0x0000;
+        let checksum = [0x00, 0x00];
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
