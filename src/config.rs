@@ -1107,7 +1107,7 @@ impl EpsConfig for Eps {
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
-        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key, checksum.to_le_bytes()].to_vec();
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key, checksum[0], checksum[1]].to_vec();
         let command = Command { cmd, data };
 
         // Send command
