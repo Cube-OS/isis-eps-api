@@ -157,11 +157,11 @@ pub enum ConfigParamWriteU8 {
 pub enum ConfigParamWriteI8 {
     #[default]
     AutoHeatEnaBP1,
-    AutoHeatEnaBP2,
-    AutoHeatEnaBP3,
+    // AutoHeatEnaBP2,
+    // AutoHeatEnaBP3,
     AutoBalEnaBP1,
-    AutoBalEnaBP2,
-    AutoBalEnaBP3,
+    // AutoBalEnaBP2,
+    // AutoBalEnaBP3,
     Vd1AlwaysEna,
     Vd2AlwaysEna,
     Vd3AlwaysEna,
