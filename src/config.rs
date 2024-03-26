@@ -1103,11 +1103,11 @@ impl EpsConfig for Eps {
     fn save_config_force(&self) -> EpsResult<()> {
         let cmd_code: u8 = SAVE_CONFIG;
         let config_key: u8 = 0xA7;
-        let checksum: u8 = 0x00;
+        let checksum: u16 = 0x0000;
 
         let cmd: u8 = PIU_STID;
         // Config key must be 0xA7, any other value will be rejected with a parameter error
-        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key, checksum].to_vec();
+        let data: Vec<u8> = [ALL_IVID, cmd_code, OVERRIDE_BID, config_key, checksum.to_le_bytes()].to_vec();
         let command = Command { cmd, data };
 
         // Send command
