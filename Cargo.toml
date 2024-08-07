@@ -2,6 +2,7 @@
 name = "isis-eps-api"
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/Cube-OS/isis-eps-api"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -9,7 +10,7 @@ edition = "2021"
 serde = "1.0"
 serde_json = "1.0"
 failure = "0.1.2"
-cubeos-service = { git = "ssh://git@github.com/Cube-OS/cubeos-service.git"}
-i2c-rs = { git = "ssh://git@github.com/Cube-OS/i2c-rs.git" }
+cubeos-service = { version = "0.4.2", registry = "cube-os" }
+i2c-rs = { version = "0.1.0", registry = "cube-os" }
 strum = "0.24"
 strum_macros = "0.24"
